@@ -1,0 +1,105 @@
+<header>
+  <section class="name">
+    <div class="container-fluid text-center">
+      <h4>
+        {{ resume?.firstName }} {{ resume?.middleName }} {{ resume?.lastName }}
+      </h4>
+      <h4>{{ resume?.jobTitle }}</h4>
+      <h4>
+        {{ resume?.phoneNumber }} | {{ resume?.email }} | {{ resume?.address }}
+      </h4>
+    </div>
+  </section>
+</header>
+<hr/>
+<section class="profile-summary">
+  <div class="container-fluid">
+    <h4>PROFILE SUMMARY </h4>
+    <div class="container-fluid ml-2">
+      <p>
+        {{ resume?.summary }}
+      </p>
+    </div>
+  </div>
+</section>
+<hr/>
+<section class="work-experience">
+  <div class="container-fluid" *ngIf="resume && resume.experiences">
+    <h4>WORK EXPERIENCE</h4>
+    <div
+      class="container-fluid"
+      *ngFor="let experience of resume.experiences?.experiences; let index = i"
+    >
+      <b>
+        {{ experience?.designation }} <br />
+        {{ experience?.companyName }} <br />
+        {{ experience?.dateFrom }} &ndash; {{ experience?.dateTo }}</b
+      >
+      <br />
+      <b>Responsibilities</b>
+      <ul>
+        <li>
+          {{ experience?.responsibilities }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+<hr/>
+<section class="project-experience">
+  <p>PROJECT EXPERIENCE</p>
+  <p>&nbsp;</p>
+  <p>Market Analysis Jan 20XX &ndash; March 20XX</p>
+  <p>
+    &middot; Developed detailed SWOT analysis to assess the strengths,
+    weaknesses, opportunities, and threats in the market, providing insights for
+    strategic decision-making.
+  </p>
+  <p>
+    &middot; Presented findings and recommendations to senior management,
+    facilitating informed decision-making regarding the product launch strategy.
+  </p>
+</section>
+<hr/>
+<section class="education">
+  <p>EDUCATION</p>
+  <p>&nbsp;</p>
+  <p>NYU May 20XX</p>
+  <p>BA, Business Administration</p>
+  <p>Cumulative GPA: 3.75/4.00</p>
+</section>
+<hr/>
+<section class="other-activities">
+  <p>RELEVANT COURSEWORK</p>
+  <p>&nbsp;</p>
+  <p>
+    Marketing Principles | Sales Techniques and Strategies | Consumer Behavior |
+    Business Negotiation | Market Research and Analysis | Business Communication
+    | Strategic Management | Financial Management
+  </p>
+  <p>&nbsp;</p>
+  <p>MEMBERSHIPS AND ASSOCIATIONS</p>
+  <p>&nbsp;</p>
+  <p>
+    American Association of Inside Sales Professionals (AA-ISP) Jan 20XX &ndash;
+    Present
+  </p>
+  <p>
+    Focused on advancing the profession of inside sales through training and
+    networking.
+  </p>
+  <p>INVOLVEMENT EXPERIENCE</p>
+  <p>UGA Tennis Team, Co-Captain Aug 20XX - May 20XX</p>
+</section>
+<hr/>
+<section class="skills">
+  <p>TECHNICAL SKILLS</p>
+  <p>
+    Prospecting and Lead Generation | Contract Negotiation | Sales Forecasting |
+    Client Relationship Management | Market Research Analysis
+  </p>
+</section>
+<hr/>
+<section class="personal-details"></section>
+<section class="declaration"></section>
+<footer></footer>

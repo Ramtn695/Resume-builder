@@ -1,0 +1,11 @@
+.text-danger{
+    color: red;
+}
+label{
+    margin: 10px;
+}
+.ng-touched{
+    &.ng-invalid{
+        border: 1px solid red;
+    }
+}

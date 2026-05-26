@@ -1,0 +1,302 @@
+{
+  "form": {
+    "sections": [
+      {
+        "id": "personalInformation",
+        "title": "Personal Information",
+        "fields": [
+          {
+            "id": "fullName",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Full Name",
+            "validators": ["required"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "address",
+            "control": "textarea",
+            "type": "text",
+            "placeholder": "Address",
+            "validators": ["required"],
+            "styles": { "width": "400px", "height": "60px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-textarea"
+          },
+          {
+            "id": "phoneNumber",
+            "control": "input",
+            "type": "tel",
+            "placeholder": "Phone Number",
+            "validators": ["required", "phone"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "emailAddress",
+            "control": "input",
+            "type": "email",
+            "placeholder": "Email Address",
+            "validators": ["required", "email"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "drivingLicense",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Driving License",
+            "validators": [],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-input"
+          },
+          {
+            "id": "linkedin",
+            "control": "input",
+            "type": "url",
+            "placeholder": "LinkedIn Profile",
+            "validators": ["url"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-input"
+          }
+        ]
+      },
+      {
+        "id": "summary",
+        "title": "Professional Summary",
+        "fields": [
+          {
+            "id": "profileSummary",
+            "control": "textarea",
+            "type": "text",
+            "placeholder": "Write a short professional summary",
+            "validators": [],
+            "styles": { "width": "500px", "height": "100px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-textarea"
+          }
+        ]
+      },
+      {
+        "id": "workExperience",
+        "title": "Work Experience",
+        "repeatable": true,
+        "fields": [
+          {
+            "id": "jobTitle",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Job Title",
+            "validators": ["required"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "company",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Company",
+            "validators": ["required"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "location",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Location",
+            "validators": [],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-input"
+          },
+          {
+            "id": "duration",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Duration (e.g., 2015 - Present)",
+            "validators": ["required"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "description",
+            "control": "textarea",
+            "type": "text",
+            "placeholder": "Job Description / Responsibilities",
+            "validators": [],
+            "styles": { "width": "500px", "height": "100px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-textarea"
+          }
+        ]
+      },
+      {
+        "id": "education",
+        "title": "Education",
+        "repeatable": true,
+        "fields": [
+          {
+            "id": "degree",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Degree / Qualification",
+            "validators": ["required"],
+            "styles": { "width": "300px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "institution",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Institution",
+            "validators": ["required"],
+            "styles": { "width": "300px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "duration",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Duration (e.g., Sep 2002 - Jun 2007)",
+            "validators": [],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-input"
+          }
+        ]
+      },
+      {
+        "id": "interests",
+        "title": "Interests",
+        "fields": [
+          {
+            "id": "interests",
+            "control": "checkboxGroup",
+            "options": ["Traveling", "Cooking", "Reading", "Sports"],
+            "validators": [],
+            "styles": { "width": "400px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-checkbox"
+          }
+        ]
+      },
+      {
+        "id": "languages",
+        "title": "Languages",
+        "repeatable": true,
+        "fields": [
+          {
+            "id": "languageName",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Enter a language (e.g., English, French)",
+            "validators": ["required"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "languageRating",
+            "control": "rating",
+            "type": "number",
+            "label": "Proficiency Level",
+            "max": 6,
+            "validators": [],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-rating"
+          }
+        ]
+      },
+      {
+        "id": "skills",
+        "title": "Skills",
+        "repeatable": true,
+        "fields": [
+          {
+            "id": "skillName",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Enter a skill (e.g., Python, SEO, Project Management)",
+            "validators": ["required"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "skillRating",
+            "control": "rating",
+            "type": "number",
+            "label": "Proficiency Level",
+            "max": 6,
+            "validators": [],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-rating"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "title": "References",
+        "repeatable": true,
+        "fields": [
+          {
+            "id": "referenceName",
+            "control": "input",
+            "type": "text",
+            "placeholder": "Reference Name",
+            "validators": ["required"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": false,
+            "class": "form-input"
+          },
+          {
+            "id": "referencePhone",
+            "control": "input",
+            "type": "tel",
+            "placeholder": "Reference Phone",
+            "validators": ["phone"],
+            "styles": { "width": "250px" },
+            "isVisible": true,
+            "optional": true,
+            "class": "form-input"
+          }
+        ]
+      }
+    ]
+  }
+}

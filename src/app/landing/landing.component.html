@@ -1,0 +1,457 @@
+<div class="landing-page container-fluid px-3 px-md-5">
+
+  <!-- Header -->
+  <div class="landing-header text-center pt-5 pb-3">
+    <h1 class="display-5 mb-2">Welcome to ResumeBuilder</h1>
+    <p class="lead">Build your professional resume in a few simple steps</p>
+  </div>
+
+  <!-- Step Progress Indicator -->
+  <div class="step-progress d-flex align-items-center justify-content-center mb-4 px-2">
+    <ng-container *ngFor="let label of stepLabels; let i = index">
+      <div class="text-center step-progress-item">
+        <div class="step-circle mx-auto"
+          [class.step-active]="currentStep === i + 1"
+          [class.step-done]="currentStep > i + 1"
+          [class.step-pending]="currentStep < i + 1">
+          <span *ngIf="currentStep > i + 1">&#10003;</span>
+          <span *ngIf="currentStep <= i + 1">{{ i + 1 }}</span>
+        </div>
+        <small class="d-block mt-1 step-label"
+          [class.text-white]="currentStep >= i + 1"
+          [class.text-white-50]="currentStep < i + 1">{{ label }}</small>
+      </div>
+      <div *ngIf="i < stepLabels.length - 1" class="step-connector flex-grow-1"
+        [class.step-connector-done]="currentStep > i + 1">
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- STEP 1: Your Details                                           -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-4" *ngIf="currentStep === 1">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <span class="step-badge me-2">1</span>
+      <h5 class="mb-0">Your Details</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control"
+            [(ngModel)]="firstName"
+            placeholder="First Name"
+            [class.is-invalid]="fieldError('firstName')"
+            (blur)="touchField('firstName')">
+          <div class="invalid-feedback">First name is required.</div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold">Middle Name <span class="text-muted fw-normal small">(Optional)</span></label>
+          <input type="text" class="form-control" [(ngModel)]="middleName" placeholder="Middle Name">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control"
+            [(ngModel)]="lastName"
+            placeholder="Last Name"
+            [class.is-invalid]="fieldError('lastName')"
+            (blur)="touchField('lastName')">
+          <div class="invalid-feedback">Last name is required.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+          <input type="email" class="form-control"
+            [(ngModel)]="email"
+            placeholder="your@email.com"
+            [class.is-invalid]="emailError()"
+            (blur)="touchField('email')"
+            list="emailDomainList">
+          <datalist id="emailDomainList">
+            <option *ngFor="let s of emailSuggestions" [value]="s"></option>
+          </datalist>
+          <div class="invalid-feedback">
+            <span *ngIf="!email.trim()">Email is required.</span>
+            <span *ngIf="email.trim() && !isValidEmail(email)">Please enter a valid email address.</span>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-info py-2 mb-0" *ngIf="firstName.trim() && lastName.trim()">
+        <strong>&#128100; Profile:</strong> {{ userDisplayName }}{{ email ? ' — ' + email : '' }}
+      </div>
+    </div>
+    <div class="card-footer bg-transparent d-flex justify-content-end">
+      <button class="btn btn-primary px-4" (click)="nextStep()">
+        Next <i class="fas fa-arrow-right ms-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- STEP 2: Experience Type                                        -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-4" *ngIf="currentStep === 2">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <span class="step-badge me-2">2</span>
+      <h5 class="mb-0">Are you Experienced or a Fresher?</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="option-card p-3 border rounded h-100"
+            [class.option-selected]="experienceType === 'experienced'"
+            (click)="onExperienceTypeChange('experienced')">
+            <div class="d-flex align-items-start gap-3">
+              <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                [checked]="experienceType === 'experienced'" readonly>
+              <div>
+                <strong>&#128188; Experienced Professional</strong>
+                <p class="text-muted small mb-0 mt-1">I have professional work experience</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="option-card p-3 border rounded h-100"
+            [class.option-selected]="experienceType === 'fresher'"
+            (click)="onExperienceTypeChange('fresher')">
+            <div class="d-flex align-items-start gap-3">
+              <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                [checked]="experienceType === 'fresher'" readonly>
+              <div>
+                <strong>&#127891; Fresher / Graduate</strong>
+                <p class="text-muted small mb-0 mt-1">I am a fresh graduate or entry-level candidate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-warning py-2 mt-3 mb-0" *ngIf="!experienceType">
+        <small>&#9888;&#65039; Please select your experience type to continue.</small>
+      </div>
+    </div>
+    <div class="card-footer bg-transparent d-flex justify-content-between">
+      <button class="btn btn-outline-danger px-4" (click)="prevStep()">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </button>
+      <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!experienceType">
+        Next <i class="fas fa-arrow-right ms-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- STEP 3: Consent & Agreement                                    -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-4" *ngIf="currentStep === 3">
+    <div class="card-header bg-secondary text-white d-flex align-items-center">
+      <span class="step-badge me-2">3</span>
+      <h5 class="mb-0">Consent &amp; Agreement</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">
+        <span *ngIf="userDisplayName"><strong>Agreement for: {{ userDisplayName }}</strong><br /></span>
+        {{ experienceType === 'experienced'
+          ? 'As an experienced professional, I understand my resume will be shared with employers.'
+          : 'As a fresher, I understand my resume will be used for job applications.' }}
+        <br /><br />
+        This will be an AI generated resume based on the information I provide. I will review the generated
+        content for accuracy. I acknowledge that the resume builder is a tool to assist in creating my resume,
+        and I am responsible for the final content and its use.
+      </p>
+      <div class="form-check p-3 border rounded"
+        [class.border-success]="agreeToTerms"
+        [class.bg-success]="agreeToTerms"
+        [class.bg-opacity-10]="agreeToTerms">
+        <input class="form-check-input" type="checkbox" id="agreeToTerms" [(ngModel)]="agreeToTerms">
+        <label class="form-check-label" for="agreeToTerms">
+          <strong>I{{ userDisplayName ? ', ' + userDisplayName + ',' : '' }} agree to the terms and conditions</strong>
+        </label>
+      </div>
+      <div class="mt-2">
+        <span class="badge fs-6"
+          [class.bg-success]="agreeToTerms"
+          [class.bg-warning]="!agreeToTerms"
+          [class.text-dark]="!agreeToTerms">
+          {{ agreeToTerms ? '✓ Agreed' : '⚠ Not agreed — check the box above to continue' }}
+        </span>
+      </div>
+    </div>
+    <div class="card-footer bg-transparent d-flex justify-content-between">
+      <button class="btn btn-outline-danger px-4" (click)="prevStep()">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </button>
+      <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!agreeToTerms">
+        Next <i class="fas fa-arrow-right ms-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- STEP 4A: Professional Summary (Experienced)                   -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-4" *ngIf="currentStep === 4 && experienceType === 'experienced'">
+    <div class="card-header bg-success text-white d-flex align-items-center">
+      <span class="step-badge me-2">4</span>
+      <h5 class="mb-0">Professional Summary — How would you like to add it?</h5>
+    </div>
+    <div class="card-body">
+
+      <!-- Type Picker -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="option-card option-card-success p-3 border rounded h-100"
+            [class.option-selected-success]="professionalSummaryType === 'custom'"
+            (click)="onProfessionalSummaryTypeChange('custom')">
+            <input class="form-check-input me-2" type="radio"
+              [checked]="professionalSummaryType === 'custom'" readonly>
+            <strong>&#9997;&#65039; Write Custom</strong>
+            <p class="text-muted small mb-0 mt-1">Write your own summary</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="option-card option-card-success p-3 border rounded h-100"
+            [class.option-selected-success]="professionalSummaryType === 'upload'"
+            (click)="onProfessionalSummaryTypeChange('upload')">
+            <input class="form-check-input me-2" type="radio"
+              [checked]="professionalSummaryType === 'upload'" readonly>
+            <strong>&#128196; Upload File</strong>
+            <p class="text-muted small mb-0 mt-1">.txt, .doc, .docx</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 border rounded h-100 option-future">
+            <input class="form-check-input me-2" type="radio" disabled>
+            <strong>&#129302; AI Generated</strong>
+            <span class="badge bg-secondary ms-1">Future Phase</span>
+            <p class="text-muted small mb-0 mt-1">AI-powered summary (coming soon)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Write Custom -->
+      <div *ngIf="professionalSummaryType === 'custom'">
+        <label class="form-label fw-bold">Write a compelling professional summary (150–200 words)</label>
+        <p class="text-muted small">Highlight your key achievements, skills, and career aspirations.</p>
+        <textarea class="form-control mb-3" rows="6"
+          placeholder="e.g., Experienced IT professional with 8+ years in software development..."
+          (change)="onProfessionalSummaryChange($event)" [value]="professionalSummary"></textarea>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm"
+            (click)="professionalSummary = ''; professionalSummaryCompleted = false"
+            [disabled]="!professionalSummary">Clear</button>
+          <button class="btn btn-success btn-sm" (click)="completeProfessionalSummary()"
+            [disabled]="!professionalSummary.trim()">&#10003; Confirm Summary</button>
+        </div>
+      </div>
+
+      <!-- Upload File -->
+      <div *ngIf="professionalSummaryType === 'upload'">
+        <label class="form-label fw-bold">Upload your professional summary file</label>
+        <input type="file" class="form-control mb-2" accept=".txt,.doc,.docx"
+          (change)="onSummaryFileSelected($event)">
+        <small class="text-muted d-block mb-3">Supported formats: .txt, .doc, .docx</small>
+        <div *ngIf="professionalSummary">
+          <label class="form-label fw-bold">File Content Preview</label>
+          <textarea class="form-control" rows="5" [value]="professionalSummary" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="alert alert-success mt-3 mb-0" *ngIf="professionalSummaryCompleted">
+        &#10003; Professional Summary is ready!
+      </div>
+    </div>
+    <div class="card-footer bg-transparent d-flex justify-content-between">
+      <button class="btn btn-outline-danger px-4" (click)="prevStep()">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </button>
+      <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!professionalSummaryCompleted">
+        Next <i class="fas fa-arrow-right ms-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- STEP 4B: Career Objective (Fresher)                           -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-4" *ngIf="currentStep === 4 && experienceType === 'fresher'">
+    <div class="card-header bg-info text-white d-flex align-items-center">
+      <span class="step-badge me-2">4</span>
+      <h5 class="mb-0">Career Objective — How would you like to add it?</h5>
+    </div>
+    <div class="card-body">
+
+      <!-- Type Picker -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="option-card option-card-info p-3 border rounded h-100"
+            [class.option-selected-info]="careerObjectiveType === 'template'"
+            (click)="onCareerObjectiveTypeChange('template')">
+            <input class="form-check-input me-2" type="radio"
+              [checked]="careerObjectiveType === 'template'" readonly>
+            <strong>&#128196; Use Template</strong>
+            <p class="text-muted small mb-0 mt-1">Pick from curated objectives</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="option-card option-card-info p-3 border rounded h-100"
+            [class.option-selected-info]="careerObjectiveType === 'custom'"
+            (click)="onCareerObjectiveTypeChange('custom')">
+            <input class="form-check-input me-2" type="radio"
+              [checked]="careerObjectiveType === 'custom'" readonly>
+            <strong>&#9997;&#65039; Write Custom</strong>
+            <p class="text-muted small mb-0 mt-1">Write your own objective</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="option-card option-card-info p-3 border rounded h-100"
+            [class.option-selected-info]="careerObjectiveType === 'upload'"
+            (click)="onCareerObjectiveTypeChange('upload')">
+            <input class="form-check-input me-2" type="radio"
+              [checked]="careerObjectiveType === 'upload'" readonly>
+            <strong>&#128196; Upload File</strong>
+            <p class="text-muted small mb-0 mt-1">.txt, .doc, .docx</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 border rounded h-100 option-future">
+            <input class="form-check-input me-2" type="radio" disabled>
+            <strong>&#129302; AI Generated</strong>
+            <span class="badge bg-secondary ms-1">Future Phase</span>
+            <p class="text-muted small mb-0 mt-1">Coming soon</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Flow -->
+      <div *ngIf="careerObjectiveType === 'template'">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Select Job Category</label>
+          <select class="form-select" (change)="onCategoryChange($event.target['value'])">
+            <option value="">-- Choose Category --</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+        <div *ngIf="careerObjectives.length > 0" class="mb-3">
+          <label class="form-label fw-bold">Select an Objective</label>
+          <div class="objective-list">
+            <button *ngFor="let obj of careerObjectives" type="button"
+              class="btn btn-outline-primary btn-sm d-block w-100 text-start mb-1"
+              [class.active]="selectedObjective === obj" (click)="selectObjective(obj)">
+              <small>{{ obj }}</small>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="Object.keys(dynamicFields).length > 0" class="card mb-3 border-info">
+          <div class="card-header bg-info text-white py-2">
+            <h6 class="mb-0">Fill in Placeholder Values</h6>
+          </div>
+          <div class="card-body">
+            <div *ngFor="let field of Object.keys(dynamicFields)" class="mb-2">
+              <label class="form-label fw-bold">{{ field }}:</label>
+              <input type="text" class="form-control" [(ngModel)]="dynamicFields[field]"
+                placeholder="Enter {{ field }}" (blur)="replaceDynamicFields()">
+            </div>
+          </div>
+        </div>
+        <div *ngIf="selectedObjective || careerObjectiveText" class="mb-3">
+          <label class="form-label fw-bold">Career Objective Preview</label>
+          <textarea class="form-control" rows="4"
+            (change)="onCustomObjectiveChange($event)" [value]="careerObjectiveText"></textarea>
+        </div>
+        <div class="d-flex gap-2 flex-wrap" *ngIf="careerObjectiveText">
+          <button class="btn btn-outline-secondary btn-sm" (click)="clearCareerObjective()">Clear</button>
+          <button class="btn btn-success btn-sm" (click)="completeCareerObjective()"
+            [disabled]="!careerObjectiveText">&#10003; Confirm</button>
+        </div>
+      </div>
+
+      <!-- Custom Flow -->
+      <div *ngIf="careerObjectiveType === 'custom'">
+        <label class="form-label fw-bold">Write Your Career Objective</label>
+        <textarea class="form-control mb-3" rows="6"
+          placeholder="Write your career objective here (2–3 sentences)..."
+          (change)="onCustomObjectiveChange($event)" [value]="careerObjectiveText"></textarea>
+        <div class="d-flex gap-2" *ngIf="careerObjectiveText">
+          <button class="btn btn-outline-secondary btn-sm" (click)="clearCareerObjective()">Clear</button>
+          <button class="btn btn-success btn-sm" (click)="completeCareerObjective()"
+            [disabled]="!careerObjectiveText">&#10003; Confirm</button>
+        </div>
+      </div>
+
+      <!-- Upload Flow -->
+      <div *ngIf="careerObjectiveType === 'upload'">
+        <label class="form-label fw-bold">Upload Your Career Objective File</label>
+        <input type="file" class="form-control mb-2" accept=".txt,.doc,.docx" (change)="onFileSelected($event)">
+        <small class="text-muted d-block mb-3">Supported formats: .txt, .doc, .docx</small>
+        <div *ngIf="careerObjectiveText">
+          <label class="form-label fw-bold">File Content Preview</label>
+          <textarea class="form-control" rows="4" [value]="careerObjectiveText" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="alert alert-success mt-3 mb-0" *ngIf="careerObjectiveCompleted">
+        &#10003; Career Objective is ready!
+      </div>
+    </div>
+    <div class="card-footer bg-transparent d-flex justify-content-between">
+      <button class="btn btn-outline-danger px-4" (click)="prevStep()">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </button>
+      <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!careerObjectiveCompleted">
+        Next <i class="fas fa-arrow-right ms-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- STEP 5: Additional Info (Future Phase)                        -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-5" *ngIf="currentStep === 5">
+    <div class="card-header bg-light d-flex align-items-center">
+      <span class="step-badge bg-secondary me-2">5</span>
+      <h5 class="mb-0 text-muted">
+        Additional Information
+        <span class="badge bg-warning text-dark ms-2">Future Phase</span>
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info py-2 mb-4">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Coming Soon:</strong> These fields will be available in a future release.
+        You can proceed to create your resume now.
+      </div>
+      <div class="row g-3 opacity-50">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">
+            Highest Educational Qualification
+            <span class="badge bg-secondary ms-1">Future Phase</span>
+          </label>
+          <select class="form-select" disabled>
+            <option>-- Coming Soon --</option>
+          </select>
+        </div>
+        <div class="col-md-6" *ngIf="experienceType === 'experienced'">
+          <label class="form-label fw-bold">
+            Total Years of Experience
+            <span class="badge bg-secondary ms-1">Future Phase</span>
+          </label>
+          <select class="form-select" disabled>
+            <option>-- Coming Soon --</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+      <button class="btn btn-outline-secondary px-4" (click)="prevStep()">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </button>
+      <button class="btn btn-success btn-lg px-5" (click)="proceedToForm()" [disabled]="!canProceed()">
+        &#127775; Create Resume
+      </button>
+    </div>
+  </div>
+
+</div>

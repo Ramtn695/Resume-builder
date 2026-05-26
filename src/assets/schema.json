@@ -1,0 +1,529 @@
+{
+  "personalInformation": [
+    {
+      "id": "firstName",
+      "control": "input",
+      "type": "text",
+      "placeholder": "First Name",
+      "validators": ["required"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": false,
+      "class": "form-input"
+    },
+    {
+      "id": "lastName",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Last Name",
+      "validators": ["required"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": false,
+      "class": "form-input"
+    },
+    {
+      "id": "suffix",
+      "control": "select",
+      "type": "dropdown",
+      "placeholder": "Suffix",
+      "validators": [],
+      "options": ["Jr.", "Sr.", "II", "III", "IV"],
+      "styles": { "width": "150px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": true,
+      "class": "form-input"
+    },
+    {
+      "id": "phoneNumber",
+      "control": "input",
+      "type": "tel",
+      "placeholder": "Phone Number",
+      "validators": ["required", "pattern:^\\+?[0-9]{7,15}$"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": false,
+      "class": "form-input"
+    },
+    {
+      "id": "securityQuestion1",
+      "control": "input",
+      "type": "text",
+      "placeholder": "What is your mother's maiden name?",
+      "validators": ["required"],
+      "styles": { "width": "400px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "securityQuestion2",
+      "control": "input",
+      "type": "text",
+      "placeholder": "What was the name of your first pet?",
+      "validators": ["required"],
+      "styles": { "width": "400px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "securityQuestion3",
+      "control": "input",
+      "type": "text",
+      "placeholder": "What was the make of your first car?",
+      "validators": ["required"],
+      "styles": { "width": "400px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "securityQuestion4",
+      "control": "input",
+      "type": "text",
+      "placeholder": "In what city were you born?",
+      "validators": [""],
+      "styles": { "width": "400px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "personal_gender",
+      "control": "select",
+      "type": "dropdown",
+      "placeholder": "Gender (Optional)",
+      "validators": [],
+      "options": ["Male", "Female", "Other", "Prefer not to say"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": true,
+      "class": "form-input"
+    },
+    {
+      "id": "height",
+      "control": "input",
+      "type": "number",
+      "placeholder": "Height (cm) (Optional)",
+      "validators": [],
+      "styles": { "width": "150px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": true,
+      "class": "form-input"
+    },
+    {
+      "id": "weight",
+      "control": "input",
+      "type": "number",
+      "placeholder": "Weight (kg) (Optional)",
+      "validators": [],
+      "styles": { "width": "150px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": true,
+      "class": "form-input"
+    },
+    {
+      "id": "hairColor",
+      "control": "select",
+      "type": "dropdown",
+      "placeholder": "Hair Color (Optional)",
+      "validators": [],
+      "options": ["Black", "Brown", "Blonde", "Red", "Gray", "Other"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": true,
+      "class": "form-input"
+    },
+    {
+      "id": "eyeColor",
+      "control": "select",
+      "type": "dropdown",
+      "placeholder": "Eye Color (Optional)",
+      "validators": [],
+      "options": ["Brown", "Blue", "Green", "Hazel", "Gray", "Other"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": true,
+      "class": "form-input"
+    },
+    {
+      "id": "dob",
+      "control": "input",
+      "type": "date",
+      "placeholder": "Date of Birth",
+      "validators": ["required"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "optional": false,
+      "class": "form-input"
+    }
+  ],
+
+  "accountInformation": [
+    {
+      "id": "username",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Enter your username",
+      "validators": ["required", "minLength:3"],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "email",
+      "control": "input",
+      "type": "email",
+      "placeholder": "Enter your email",
+      "validators": ["required", "email"],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "password",
+      "control": "input",
+      "type": "password",
+      "placeholder": "Enter your password",
+      "validators": ["required", "minLength:6"],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "account_gender_radio",
+      "control": "radio",
+      "type": "radio",
+      "placeholder": "",
+      "validators": ["required"],
+      "options": ["Male", "Female", "Other"],
+      "styles": { "display": "flex", "gap": "10px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "hobbies",
+      "control": "checkbox",
+      "type": "checkbox",
+      "placeholder": "",
+      "validators": [],
+      "options": ["Reading", "Traveling", "Gaming", "Sports"],
+      "styles": { "display": "grid", "gridTemplateColumns": "1fr 1fr" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "country_account",
+      "control": "select",
+      "type": "dropdown",
+      "placeholder": "Select your country",
+      "validators": ["required"],
+      "options": ["USA", "India", "UK", "Canada"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "languages",
+      "control": "multi-select",
+      "type": "multi-select",
+      "placeholder": "Select languages you speak",
+      "validators": ["required"],
+      "options": ["English", "Spanish", "French", "German", "Mandarin"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "city_combo",
+      "control": "combo-box",
+      "type": "combo-box",
+      "placeholder": "Choose or type your city",
+      "validators": ["required"],
+      "options": ["New York", "Los Angeles", "Chicago", "Houston", "Miami"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "search_box",
+      "control": "search-box",
+      "type": "search",
+      "placeholder": "Search here...",
+      "validators": [],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "bio",
+      "control": "textarea",
+      "type": "textarea",
+      "placeholder": "Tell us about yourself",
+      "validators": ["maxLength:500"],
+      "styles": { "width": "400px", "height": "100px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "resume",
+      "control": "file",
+      "type": "file",
+      "placeholder": "Upload your resume",
+      "validators": ["required", "fileType:pdf,docx"],
+      "fileInputs": { "maxSizeMB": 5, "multiple": false },
+      "styles": { "margin": "10px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    }
+  ],
+
+  "addressInformation": [
+    {
+      "id": "street",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Street Address",
+      "validators": ["required"],
+      "styles": { "width": "400px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "street2",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Street Address Line 2",
+      "validators": [],
+      "styles": { "width": "400px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "city",
+      "control": "input",
+      "type": "text",
+      "placeholder": "City",
+      "validators": ["required"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "country",
+      "control": "select",
+      "type": "dropdown",
+      "placeholder": "Select Country",
+      "validators": ["required"],
+      "options": ["USA", "India", "UK", "Canada"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "postalCode",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Postal / ZIP Code",
+      "validators": ["required", "pattern:^[0-9A-Za-z-]+$"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "yearsAtAddress",
+      "control": "input",
+      "type": "number",
+      "placeholder": "Years at Address",
+      "validators": ["required", "min:0", "max:100"],
+      "styles": { "width": "150px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    }
+  ],
+
+  "financialInformation": [
+    {
+      "id": "annualIncome",
+      "control": "input",
+      "type": "number",
+      "placeholder": "Annual Income (USD)",
+      "validators": ["required", "min:0"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "creditScore",
+      "control": "input",
+      "type": "number",
+      "placeholder": "Credit Score",
+      "validators": ["min:300", "max:850"],
+      "styles": { "width": "150px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "bankName",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Bank Name",
+      "validators": ["required"],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "bankAccountNumber",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Bank Account Number",
+      "validators": ["required", "pattern:^[0-9A-Za-z-]+$"],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "routingNumber",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Routing / Sort Code",
+      "validators": [],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    }
+  ],
+
+  "employmentInformation": [
+    {
+      "id": "employerName",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Employer Name",
+      "validators": ["required"],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "jobTitle",
+      "control": "input",
+      "type": "text",
+      "placeholder": "Job Title",
+      "validators": ["required"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "employmentYears",
+      "control": "input",
+      "type": "number",
+      "placeholder": "Years Employed",
+      "validators": ["min:0", "max:50"],
+      "styles": { "width": "150px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "employmentType",
+      "control": "select",
+      "type": "dropdown",
+      "placeholder": "Employment Type",
+      "validators": ["required"],
+      "options": ["Full-time", "Part-time", "Contract", "Self-employed"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "workEmail",
+      "control": "input",
+      "type": "email",
+      "placeholder": "Work Email",
+      "validators": ["email"],
+      "styles": { "width": "300px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "workPhone",
+      "control": "input",
+      "type": "tel",
+      "placeholder": "Work Phone",
+      "validators": ["pattern:^\\+?[0-9]{7,15}$"],
+      "styles": { "width": "250px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    }
+  ],
+
+  "signaturePanel": [
+    {
+      "id": "signature",
+      "control": "signature-panel",
+      "type": "canvas",
+      "placeholder": "Sign here",
+      "validators": ["required"],
+      "styles": {
+        "border": "1px solid #ccc",
+        "width": "400px",
+        "height": "150px"
+      },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    },
+    {
+      "id": "signatureDate",
+      "control": "input",
+      "type": "date",
+      "placeholder": "Signature Date",
+      "validators": ["required"],
+      "styles": { "width": "200px" },
+      "isVisible": true,
+      "isHidden": false,
+      "class": "form-input"
+    }
+  ]
+}

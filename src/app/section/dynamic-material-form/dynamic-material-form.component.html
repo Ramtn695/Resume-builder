@@ -1,0 +1,336 @@
+<div class="dynamic-material-form mat-elevation-z2" style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem;">
+  <mat-slide-toggle [(ngModel)]="useStepper">Use Stepper</mat-slide-toggle>
+
+  <!-- Tabview layout: headings on left, form on right -->
+  <div *ngIf="!useStepper" class="tabview-container" style="display: flex; height: 600px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
+    <!-- Left pane: group headings -->
+    <nav class="group-list" style="width: 200px; border-right: 1px solid #ccc; overflow-y: auto;">
+      <mat-nav-list>
+        <mat-list-item
+          *ngFor="let g of groups; let gi = index"
+          (click)="activeIndex = gi"
+          [class.active]="activeIndex === gi"
+          style="cursor: pointer;"
+        >
+          {{ g.name }}
+        </mat-list-item>
+      </mat-nav-list>
+    </nav>
+
+    <!-- Right pane: form for active group -->
+    <section class="group-form" style="flex: 1; padding: 1rem; overflow-y: auto;">
+      <form [formGroup]="groups[activeIndex].form" class="form-panel">
+        <h2>{{ groups[activeIndex].name }}</h2>
+
+        <div class="field-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+          <ng-container *ngFor="let field of groups[activeIndex].fields">
+            <ng-container *ngIf="field.isVisible && !field.isHidden">
+              <!-- input -->
+              <mat-form-field
+                *ngIf="
+                  field.control === 'input' &&
+                  [
+                    'text',
+                    'email',
+                    'password',
+                    'number',
+                    'tel',
+                    'date'
+                  ].includes(field.type)
+                "
+                appearance="outline"
+                [ngClass]="field.class"
+                style="width: 100%;"
+              >
+                <mat-label>{{ field.placeholder || field.id }}</mat-label>
+                <input
+                  matInput
+                  [type]="field.type"
+                  [formControlName]="field.id"
+                  [attr.aria-label]="field.id"
+                  [ngClass]="field.class"
+                />
+                <mat-error *ngIf="groups[activeIndex].form.get(field.id)?.hasError('required')"
+                  >Required</mat-error
+                >
+                <mat-error *ngIf="groups[activeIndex].form.get(field.id)?.hasError('email')"
+                  >Invalid email</mat-error
+                >
+                <mat-error *ngIf="groups[activeIndex].form.get(field.id)?.hasError('pattern')"
+                  >Invalid format</mat-error
+                >
+              </mat-form-field>
+
+              <!-- textarea -->
+              <mat-form-field
+                *ngIf="field.control === 'textarea'"
+                appearance="outline"
+                class="full-width"
+                style="width: 100%;"
+              >
+                <mat-label>{{ field.placeholder || field.id }}</mat-label>
+                <textarea
+                  matInput
+                  [formControlName]="field.id"
+                  rows="4"
+                ></textarea>
+              </mat-form-field>
+
+              <!-- select -->
+              <mat-form-field
+                *ngIf="field.control === 'select'"
+                appearance="outline"
+                class="full-width"
+                style="width: 100%;"
+              >
+                <mat-label>{{ field.placeholder || field.id }}</mat-label>
+                <mat-select [formControlName]="field.id">
+                  <mat-option *ngFor="let o of field.options" [value]="o">{{
+                    o
+                  }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- multi-select -->
+              <mat-form-field
+                *ngIf="field.control === 'multi-select'"
+                appearance="outline"
+                class="full-width"
+                style="width: 100%;"
+              >
+                <mat-label>{{ field.placeholder || field.id }}</mat-label>
+                <mat-select
+                  [formControlName]="field.id"
+                  multiple
+                  (selectionChange)="
+                    onMultiSelectChange(activeIndex, field, $event.value)
+                  "
+                >
+                  <mat-option *ngFor="let o of field.options" [value]="o">{{
+                    o
+                  }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- combo-box (autocomplete) -->
+              <mat-form-field
+                *ngIf="field.control === 'combo-box'"
+                appearance="outline"
+                class="full-width"
+                style="width: 100%;"
+              >
+                <mat-label>{{ field.placeholder || field.id }}</mat-label>
+                <input type="text" matInput [formControlName]="field.id" [matAutocomplete]="'auto' + field.id" />
+                <mat-autocomplete #auto{{field.id}}="matAutocomplete">
+                  <mat-option *ngFor="let o of field.options" [value]="o">{{
+                    o
+                  }}</mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+
+              <!-- search -->
+              <mat-form-field
+                *ngIf="field.control === 'search-box'"
+                appearance="outline"
+                class="full-width"
+                style="width: 100%;"
+              >
+                <mat-label>{{ field.placeholder || field.id }}</mat-label>
+                <input matInput type="search" [formControlName]="field.id" />
+                <button mat-icon-button matSuffix aria-label="Search">
+                  <mat-icon>search</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <!-- radio -->
+              <div *ngIf="field.control === 'radio'" class="control-row" style="margin-top: 1rem;">
+                <label class="control-label">{{
+                  field.placeholder || field.id
+                }}</label>
+                <mat-radio-group [formControlName]="field.id">
+                  <mat-radio-button
+                    *ngFor="let o of field.options"
+                    [value]="o"
+                    >{{ o }}</mat-radio-button
+                  >
+                </mat-radio-group>
+              </div>
+
+              <!-- checkbox group -->
+              <div *ngIf="field.control === 'checkbox'" class="control-row" style="margin-top: 1rem;">
+                <label class="control-label">{{
+                  field.placeholder || field.id
+                }}</label>
+                <div class="checkbox-group">
+                  <mat-checkbox
+                    *ngFor="let o of field.options"
+                    (change)="toggleCheckbox(activeIndex, field, o, $event.checked)"
+                    [checked]="(groups[activeIndex].form.get(field.id)?.value || []).includes(o)"
+                  >
+                    {{ o }}
+                  </mat-checkbox>
+                </div>
+              </div>
+
+              <!-- file -->
+              <div *ngIf="field.control === 'file'" class="control-row" style="margin-top: 1rem;">
+                <label class="control-label">{{
+                  field.placeholder || field.id
+                }}</label>
+                <input
+                  type="file"
+                  (change)="onFileChange(activeIndex, field, $event)"
+                  [attr.multiple]="field.fileInputs?.multiple ? true : null"
+                />
+              </div>
+
+              <!-- signature -->
+              <div
+                *ngIf="field.control === 'signature-panel'"
+                class="control-row"
+                style="margin-top: 1rem;"
+              >
+                <label class="control-label">{{
+                  field.placeholder || field.id
+                }}</label>
+                <div class="sig-wrap">
+                  <canvas
+                    #sigCanvas
+                    [attr.data-id]="field.id"
+                    class="signature-canvas"
+                  ></canvas>
+                  <div class="sig-actions">
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      type="button"
+                      (click)="clearSignature(activeIndex, field)"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+
+        <div class="actions" style="margin-top: 1rem; display: flex; gap: 1rem;">
+          <button
+            mat-button
+            color="primary"
+            (click)="prev()"
+            [disabled]="activeIndex === 0"
+          >
+            Previous
+          </button>
+          <button
+            mat-button
+            color="primary"
+            (click)="next()"
+            [disabled]="activeIndex === groups.length - 1"
+          >
+            Next
+          </button>
+          <button mat-raised-button color="accent" (click)="submit()">
+            Submit
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- Stepper layout -->
+  <mat-horizontal-stepper
+    *ngIf="useStepper"
+    linear
+    [selectedIndex]="activeIndex"
+    style="margin-top: 1rem;"
+  >
+    <mat-step *ngFor="let g of groups; let gi = index" [stepControl]="g.form">
+      <form [formGroup]="g.form" class="form-panel">
+        <ng-template matStepLabel>{{ g.name }}</ng-template>
+
+        <div class="field-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+          <ng-container *ngFor="let field of g.fields">
+            <ng-container *ngIf="field.isVisible && !field.isHidden">
+              <mat-form-field
+                *ngIf="
+                  field.control === 'input' &&
+                  [
+                    'text',
+                    'email',
+                    'password',
+                    'number',
+                    'tel',
+                    'date'
+                  ].includes(field.type)
+                "
+                appearance="outline"
+                class="full-width"
+                style="width: 100%;"
+              >
+                <mat-label>{{ field.placeholder || field.id }}</mat-label>
+                <input
+                  matInput
+                  [type]="field.type"
+                  [formControlName]="field.id"
+                />
+              </mat-form-field>
+
+              <!-- other controls same as above -->
+              <div
+                *ngIf="field.control === 'signature-panel'"
+                class="control-row"
+                style="margin-top: 1rem;"
+              >
+                <label class="control-label">{{
+                  field.placeholder || field.id
+                }}</label>
+                <div class="sig-wrap">
+                  <canvas
+                    #sigCanvas
+                    [attr.data-id]="field.id"
+                    class="signature-canvas"
+                  ></canvas>
+                  <div class="sig-actions">
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      type="button"
+                      (click)="clearSignature(gi, field)"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+
+        <div class="actions" style="margin-top: 1rem; display: flex; gap: 1rem;">
+          <button
+            mat-button
+            matStepperPrevious
+            (click)="prev()"
+            [disabled]="gi === 0"
+          >
+            Back
+          </button>
+          <button
+            mat-button
+            matStepperNext
+            (click)="next()"
+            [disabled]="gi === groups.length - 1"
+          >
+            Next
+          </button>
+          <button mat-raised-button color="accent" (click)="submit()">
+            Submit
+          </button>
+        </div>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>

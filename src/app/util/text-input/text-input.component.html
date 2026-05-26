@@ -1,0 +1,108 @@
+<div class="container-fluid">
+    <div>
+      <div class="form-group" *ngIf="textType">
+        <label for="{{ fieldName }}">{{ fieldName | camelToTitle }}</label>
+  
+        <!-- Input field with dynamic attributes -->
+        <input
+          [type]="type"
+          id="{{ fieldName }}"
+          placeholder="Enter {{ fieldName | camelToTitle }}"
+          [formControl]="formControl"
+          class="form-control {{ myClassName }}"
+          [style]="myStyles"
+        />
+  
+        <!-- Custom error message -->
+        <div
+          *ngIf="formControl && formControl.touched && formControl.errors"
+          class="text-danger"
+        >
+          {{ getErrorMessage(formControl,fieldName) }}
+        </div>
+      </div>
+      <div class="form-group" *ngIf="radioType">
+        <label for="{{ fieldName }}">{{ fieldName | camelToTitle }}</label>
+  
+        <!-- Input field with dynamic attributes -->
+        <div class="form-group" *ngIf="values.length > 0; else noValues">
+          <div *ngFor="let option of values">
+            <input
+              type="radio"
+              class="d-inline-block m-2 sm-2"
+              [id]="option"
+              [formControl]="formControl"
+              [name]="fieldName"
+              value="{{option}}"
+            />
+            <label for="{{ option }}">{{ option }}</label>
+          </div>
+        </div>
+
+        <!-- Custom error message -->
+        <div
+          *ngIf="formControl && formControl.touched && formControl.errors"
+          class="text-danger"
+        >
+          {{ getErrorMessage(formControl,fieldName) }}
+        </div>
+      </div>
+      <div class="form-group" *ngIf="checkBoxType">
+        <label for="{{ fieldName }}">{{ fieldName | camelToTitle }}</label>
+  
+        <!-- Input field with dynamic attributes -->
+        <div class="form-group" *ngIf="values.length > 0; else noValues">
+          <div *ngFor="let option of values">
+            <input
+              type="checkbox"
+              class="d-inline-block m-2 sm-2"
+              [id]="option"
+              [formControl]="formControl"
+              [name]="fieldName"
+              value="{{option}}"
+            />
+            <label for="{{ option }}">{{ option }}</label>
+          </div>
+        </div>
+
+        <!-- Custom error message -->
+        <div
+          *ngIf="formControl && formControl.touched && formControl.errors"
+          class="text-danger"
+        >
+          {{ getErrorMessage(formControl,fieldName) }}
+        </div>
+      </div>
+      <div class="form-group" *ngIf="textAreaType">
+        <label for="{{ fieldName }}">{{ fieldName | camelToTitle }}</label>
+  
+        <!-- Input field with dynamic attributes -->
+        <textarea
+          class="form-control"
+          id="{{ fieldName }}"
+          placeholder="Enter {{ fieldName | camelToTitle }}"
+          [formControl]="formControl"
+          cols="20"
+          rows="3"
+        ></textarea>
+  
+        <!-- Custom error message -->
+        <div
+          *ngIf="formControl && formControl.touched && formControl.errors"
+          class="text-danger"
+        >
+          {{ getErrorMessage(formControl, fieldName) }}
+        </div>
+      </div>
+    </div>
+  
+    <ng-template #loading>
+      <!-- Loading or fallback content -->
+      <p>Loading...</p>
+    </ng-template>
+    <ng-template #noValues>
+      <!-- Loading or fallback content -->
+      <p class="text-danger">No Input Fields...</p>
+    </ng-template>
+  </div>
+  

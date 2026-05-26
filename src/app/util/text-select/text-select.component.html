@@ -1,0 +1,45 @@
+<div class="container-fluid">
+    <div>
+      <div class="form-group">
+        <label for="{{ fieldName }}">{{ fieldName | camelToTitle }}</label>
+  
+        <!-- Input field with dynamic attributes -->
+        <div
+          class="form-group"
+          *ngIf="values.length > 0; else noValues"
+        >
+          <select
+            class="d-inline-block m-2 sm-2 form-control"
+            id="{{ fieldName }}"
+            name="{{ fieldName }}"
+            (change)="onInputChange($event)"
+            [multiple]="isMultiple"
+          >
+            <option [value]="null" disabled [selected]="!_value">Please select {{ fieldName | camelToTitle }}</option>
+            <option *ngFor="let value of values" [value]="value"
+              [selected]="isMultiple ? (_value && _value.includes(value)) : (_value === value)">
+              {{value}}
+            </option>
+          </select>
+        </div>
+  
+        <!-- Error message if the field is invalid and touched -->
+        <div
+          *ngIf="formControl && formControl.invalid && formControl.touched"
+          class="text-danger"
+        >
+          {{ fieldName | camelToTitle }} is required
+        </div>
+      </div>
+    </div>
+  
+    <ng-template #loading>
+      <!-- Loading or fallback content -->
+      <p>Loading...</p>
+    </ng-template>
+    <ng-template #noValues>
+      <!-- Loading or fallback content -->
+      <p class="text-danger">No Input Fields...</p>
+    </ng-template>
+  </div>
+  
