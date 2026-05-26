@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Resume } from '../resume';
-import ResumeService from '../resume.service';
+import { Resume } from '../model/resume';
+import { ResumeService } from '../services/resume.service';
 
 @Component({
   selector: 'app-view',
@@ -9,13 +9,13 @@ import ResumeService from '../resume.service';
 })
 export class ViewComponent implements OnInit {
 
-  resume: Resume;
+  resume!: Resume;
   constructor(private resumeService: ResumeService) {}
 
   ngOnInit() {
-    this.resume = JSON.parse(this.resumeService.getResume());
-    console.log(this.resume);
-    
+    const raw = this.resumeService.getResume();
+    if (!raw) { return; }
+    this.resume = JSON.parse(raw);
   }
 
 

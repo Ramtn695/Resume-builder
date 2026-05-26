@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Resume } from './resume';
+import { Resume } from '../model/resume';
 
 @Injectable({ providedIn: 'root' })
-export default class ResumeService {
-  resume: Resume;
+export class ResumeService {
+  resume!: Resume;
   constructor() { }
 
   createResume(resumeData: Resume) {

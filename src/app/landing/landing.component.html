@@ -1,7 +1,7 @@
 <div class="landing-page container-fluid px-3 px-md-5">
 
   <!-- Header -->
-  <div class="landing-header text-center pt-5 pb-3">
+  <div class="landing-header text-center pt-5 pb-3 mb-4">
     <h1 class="display-5 mb-2">Welcome to ResumeBuilder</h1>
     <p class="lead">Build your professional resume in a few simple steps</p>
   </div>
@@ -407,23 +407,50 @@
   </div>
 
   <!-- ─────────────────────────────────────────────────────────────── -->
-  <!-- STEP 5: Additional Info (Future Phase)                        -->
+  <!-- STEP 5: Education Preferences                                 -->
   <!-- ─────────────────────────────────────────────────────────────── -->
   <div class="card shadow-sm mb-5" *ngIf="currentStep === 5">
-    <div class="card-header bg-light d-flex align-items-center">
-      <span class="step-badge bg-secondary me-2">5</span>
-      <h5 class="mb-0 text-muted">
-        Additional Information
-        <span class="badge bg-warning text-dark ms-2">Future Phase</span>
-      </h5>
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <span class="step-badge me-2">5</span>
+      <h5 class="mb-0">Education Preferences</h5>
     </div>
     <div class="card-body">
       <div class="alert alert-info py-2 mb-4">
         <i class="fas fa-info-circle me-2"></i>
-        <strong>Coming Soon:</strong> These fields will be available in a future release.
-        You can proceed to create your resume now.
+        <strong>Optional:</strong> Select your country's education system to display education levels in your local format.
+        This applies to your <strong>first education entry</strong>. Additional entries can be configured individually.
+        Leaving it as default uses the international (English) format.
       </div>
-      <div class="row g-3 opacity-50">
+
+      <!-- Country Preference Selector -->
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Education System / Country Language</label>
+          <select class="form-select"
+            [(ngModel)]="educationCountryPreference"
+            (ngModelChange)="onEducationPreferenceChange($event)">
+            <option value="">&#127760; English / Global Standard (Default)</option>
+            <option *ngFor="let c of educationCountriesList" [value]="c.name">{{ c.name }}</option>
+          </select>
+          <small class="text-muted">Determines what education level names appear in the resume form.</small>
+        </div>
+
+        <!-- Preview of levels for selected country -->
+        <div class="col-md-6" *ngIf="educationPreviewLevels.length">
+          <label class="form-label fw-bold">
+            Education Levels Preview
+            <span class="badge bg-primary ms-1">{{ educationCountryPreference }}</span>
+          </label>
+          <ul class="list-group list-group-flush border rounded" style="max-height: 180px; overflow-y: auto;">
+            <li *ngFor="let level of educationPreviewLevels" class="list-group-item py-1 small">
+              {{ level }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Future Phase fields -->
+      <div class="row g-3 mt-3 opacity-50">
         <div class="col-md-6">
           <label class="form-label fw-bold">
             Highest Educational Qualification

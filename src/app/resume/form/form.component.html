@@ -360,14 +360,14 @@
               </section>
             </div>
             <button
-              class="btn btn-primary m-2 d-block"
+              class="btn btn-primary m-2 d-inline-block"
               matStepperNext
               (click)="markAllTouched(education)"
             >
               Next
             </button>
             <button
-              class="btn btn-danger m-2 d-block"
+              class="btn btn-danger m-2 d-inline-block"
               type="button"
               (click)="removeEducation(i)"
               [disabled]="(educationForm.get('educations')['controls'].length <= 1)"
@@ -382,7 +382,7 @@
           <button matStepperPrevious class="btn btn-secondary m-2">Back</button>
           <button
             type="submit"
-            class="btn btn-primary m-2 d-block"
+            class="btn btn-primary m-2 d-inline-block"
             matStepperForward
             [disabled]="educationForm.invalid"
             (click)="onEducationSubmit(stepper)"

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CAREER_OBJECTIVES, CAREER_OBJECTIVE_CATEGORIES } from 'src/constants/career-objectives';
+import { EducationService } from '../resume/services/education.service';
 
 @Component({
   selector: 'app-landing',
@@ -59,11 +60,17 @@ export class LandingComponent implements OnInit {
 
   categories = CAREER_OBJECTIVE_CATEGORIES;
 
-  constructor(private router: Router) {}
+  // ── Step 5: Education Preferences ────────────────────────────────
+  educationCountryPreference = '';
+  educationPreviewLevels: string[] = [];
+  educationCountriesList: { name: string; isoCode: string }[] = [];
+
+  constructor(private router: Router, private educationService: EducationService) {}
 
   ngOnInit(): void {
     localStorage.clear();
     sessionStorage.clear();
+    this.educationCountriesList = this.educationService.getEducationCountries();
   }
 
   // ── Step Navigation ───────────────────────────────────────────────
@@ -258,11 +265,20 @@ export class LandingComponent implements OnInit {
       lastName: this.lastName,
       fullName: this.userDisplayName,
       email: this.email,
-      isTermsAgreed:this.agreeToTerms
+      isTermsAgreed:this.agreeToTerms,
+      preferredEducationCountry: this.educationCountryPreference
     };
     sessionStorage.setItem('resumeSummary', JSON.stringify(summaryData));
     sessionStorage.setItem('experienceType', this.experienceType);
+    sessionStorage.setItem('educationPreferences', JSON.stringify({
+      preferredCountry: this.educationCountryPreference || ''
+    }));
     this.router.navigate(['/resume/form']);
+  }
+
+  onEducationPreferenceChange(country: string): void {
+    this.educationCountryPreference = country;
+    this.educationPreviewLevels = this.educationService.getEducationLevelBasedOnCountry(country);
   }
 
   private resetSummaryFields(): void {

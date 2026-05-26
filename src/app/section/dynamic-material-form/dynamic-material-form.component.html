@@ -120,8 +120,8 @@
                 style="width: 100%;"
               >
                 <mat-label>{{ field.placeholder || field.id }}</mat-label>
-                <input type="text" matInput [formControlName]="field.id" [matAutocomplete]="'auto' + field.id" />
-                <mat-autocomplete #auto{{field.id}}="matAutocomplete">
+                <input type="text" matInput [formControlName]="field.id" [matAutocomplete]="auto" />
+                <mat-autocomplete #auto="matAutocomplete">
                   <mat-option *ngFor="let o of field.options" [value]="o">{{
                     o
                   }}</mat-option>

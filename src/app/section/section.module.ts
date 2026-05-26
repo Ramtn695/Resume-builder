@@ -19,6 +19,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatListModule } from '@angular/material/list';
 import { FormLayoutComponent } from './form-layout/form-layout.component';
 
 @NgModule({
@@ -41,6 +42,7 @@ import { FormLayoutComponent } from './form-layout/form-layout.component';
     MatAutocompleteModule,
     MatTooltipModule,
     MatSlideToggleModule,
+    MatListModule,
   ],
   exports: [DynamicMaterialFormComponent,FormLayoutComponent],
 })

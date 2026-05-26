@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import ResumeService from '../resume.service';
+import { ResumeService } from '../services/resume.service';
 import {
   CATEGORY,
   PROGRAM_NAME,
@@ -12,7 +12,8 @@ import {
 import { MatStepper } from '@angular/material/stepper';
 import { FormUtils } from './form.utils';
 import { EducationFormField, ExperienceFormField, ProjectFormField, PersonalDetailsFormField } from './form.fields';
-import { LocationService } from 'src/app/services/location.service';
+import { LocationService } from '../services/location.service';
+import { EducationService } from '../services/education.service';
 
 @Component({
   selector: 'app-form',
@@ -51,13 +52,15 @@ export class FormComponent implements OnInit {
   // Configuration from config.js
   maxEducations: number = (window as any).appConfig?.maxEducations || 5;
   maxExperiences: number = (window as any).appConfig?.maxExperiences || 5;
+  educationPreferredCountry = '';
 
   constructor(
     private fb: FormBuilder,
     private resumeService: ResumeService,
     private route: Router,
     private formUtilService: FormUtils,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private educationService: EducationService
   ) { }
 
   ngOnInit(): void {
@@ -68,11 +71,26 @@ export class FormComponent implements OnInit {
       return;
     }
 
-    const { experienceType, summary, firstName, middleName, lastName, email } = JSON.parse(summaryData);
+    let parsedSummary: any;
+    try {
+      parsedSummary = JSON.parse(summaryData);
+    } catch {
+      this.route.navigate(['/landing']);
+      return;
+    }
+    const { experienceType, summary, firstName, middleName, lastName, email } = parsedSummary;
 
     // Set isExperienced based on user type
     this.isExperienced = experienceType === 'experienced';
 
+    // Load education preferences from landing step 5
+    const eduPrefsData = sessionStorage.getItem('educationPreferences');
+    if (eduPrefsData) {
+      try {
+        const eduPrefs = JSON.parse(eduPrefsData);
+        this.educationPreferredCountry = eduPrefs.preferredCountry || '';
+      } catch { }
+    }
 
     this.initializeLocations();
     this.professionalForm = this.fb.group({
@@ -146,7 +164,7 @@ export class FormComponent implements OnInit {
       experienceDetails: this.experienceForm.value,
       projectDetails: this.projectForm.value,
       personalDetails: this.professionalForm.value,
-      summaryData: JSON.parse((sessionStorage.getItem('summaryData')) as string)
+      summaryData: JSON.parse(sessionStorage.getItem('resumeSummary') || 'null')
     }
     this.resumeService.createResume(this.resumeDetails);
     console.log(this.resumeService.getResume());
@@ -309,7 +327,9 @@ export class FormComponent implements OnInit {
     const { valuesSource, staticValues, id } = field;
 
     if (valuesSource === "courseNames") {
-      return this.programNames
+      const country = formGroup.get('institutionCountry')?.value || '';
+      const effectiveCountry = country || (index === 0 ? this.educationPreferredCountry : '');
+      return this.educationService.getEducationLevelBasedOnCountry(effectiveCountry);
     }
 
     if (valuesSource === 'static' && staticValues) {
@@ -317,7 +337,9 @@ export class FormComponent implements OnInit {
     }
 
     if (valuesSource === 'program') {
-      return this.getProgram(field, formGroup, index);
+      const country = formGroup.get('institutionCountry')?.value || '';
+      const courseVal = formGroup.get('courseName')?.value;
+      return this.educationService.getFieldMajorOptions(country, courseVal);
     }
 
     if (valuesSource === 'specialization' && index !== undefined) {
@@ -391,6 +413,7 @@ export class FormComponent implements OnInit {
       formGroup.get('programName')?.setValue('');
       formGroup.get('fieldMajor')?.setValue('');
       formGroup.get('fieldMajorOther')?.setValue('');
+      formGroup.get('courseNameOther')?.setValue('');
       if (index !== undefined) this.educationSpecializations[index] = [];
     }
 
@@ -399,6 +422,7 @@ export class FormComponent implements OnInit {
       this.onProgramChange(value, index);
       formGroup.get('fieldMajor')?.setValue('');
       formGroup.get('fieldMajorOther')?.setValue('');
+      formGroup.get('programNameOther')?.setValue('');
     }
 
     // Institution Country change - update per-entry states

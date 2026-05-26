@@ -77,6 +77,14 @@ export const ExperienceFormField = [
 ];
 
 export const EducationFormField = [
+   {
+    id: 'institutionCountry',
+    fieldType: 'select',
+    initialValue: '',
+    validators: Validators.required,
+    label: 'Country',
+    valuesSource: 'country',
+  },
   {
     id: 'courseName',
     fieldType: 'select',
@@ -84,6 +92,15 @@ export const EducationFormField = [
     validators: Validators.required,
     label: 'Course Name',
     valuesSource: 'courseNames',
+    otherField: 'courseNameOther',
+  },
+  {
+    id: 'courseNameOther',
+    fieldType: 'text',
+    initialValue: '',
+    validators: null,
+    label: 'Specify Education Level',
+    conditional: true,
   },
   {
     id: 'programName',
@@ -93,6 +110,15 @@ export const EducationFormField = [
     dependsOn: 'courseName',
     label: 'Program Name',
     valuesSource: 'program',
+    otherField: 'programNameOther',
+  },
+  {
+    id: 'programNameOther',
+    fieldType: 'text',
+    initialValue: '',
+    validators: null,
+    label: 'Specify Program Name',
+    conditional: true,
   },
   {
     id: 'fieldMajor',
@@ -132,14 +158,6 @@ export const EducationFormField = [
     initialValue: '',
     validators: Validators.required,
     label: 'Board/University',
-  },
-  {
-    id: 'institutionCountry',
-    fieldType: 'select',
-    initialValue: '',
-    validators: Validators.required,
-    label: 'Country',
-    valuesSource: 'country',
   },
   {
     id: 'institutionState',
