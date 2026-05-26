@@ -139,6 +139,60 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Version History
 
+### v1.9.3 — 2026-05-26 (Minor)
+
+Five personal-details and summary enhancements: (1) Education summary panels now list achievements when present. (2) Summary cards (experience and education) use explicit font sizes — title 18px, sub-heading 16px, content 14px. (3) Declaration section gains a "Write My Own" toggle alongside the existing format picker, with a textarea that saves the custom text independently. (4) Address field split into Street Name (optional), City, State/Province, Country, and Postal/Zip Code (optional); landing-location pre-population fills each field individually. (5) Languages Known optional FormArray added to Personal Details, pre-seeded with English, with an 90-language dropdown for additions and per-language remove buttons.
+
+---
+
+### v1.9.2 — 2026-05-26 (Patch)
+
+Fixed persistent `No provider for NgControl` error by removing `[(ngModel)]` from the declaration format `<select>` inside the reactive form and replacing it with a native template-ref `(change)` binding — eliminating the `NgControlStatus`/`NgModel` conflict entirely. Added loading spinner: `isLoading = true` on component init, form construction deferred via `setTimeout(0)` so Angular renders the `mat-spinner` on the first change-detection cycle before the stepper is built, removing the blank-page flash on first load.
+
+---
+
+### v1.9.1 — 2026-05-26 (Patch)
+
+Fixed four runtime errors in the form stepper: removed `*ngIf` from stable `<mat-step>` elements (causing Angular Material to misindex panels and show wrong step content), added `maxReachedStep` guard to prevent sidebar navigation from skipping unfilled steps, removed duplicate `MatStepperModule` from `SectionModule` resolving the multiple-component conflict, and added missing `FormsModule` to `ResumeModule` to satisfy `NgControl` injection needed by the `[(ngModel)]` declaration selector.
+
+---
+
+### v1.9.0
+
+- **Experience/Education Summary Panels** (req 1-6): After filling all entries, a summary panel shows all data in cards with Edit buttons; "Review & Accept" advances to the next step; panel is hidden by default; panels only activate when form entries are valid
+- **Fix: Personal Details section** (req 7): Fixed `[type]="select"` → `type="select"` binding error on gender field in personal details
+- **icon-registry.json rebuilt** (req 8): Grouped by `iconName` with `appliedAt` locations; no file paths or replacedFrom fields
+- **Landing country note** (req 9): Added hint under Country field — "This will be used on filling user address only and not for other details"
+- **Education achievements** (req 10): Added optional `achievements` FormArray to each education entry with add/remove UI
+
+## v1.8.0
+
+- Applied Material Icons (`<mat-icon>`) across all HTML templates replacing emojis and Font Awesome icons
+- Replaced 30 icons in `landing.component.html` (step progress, navigation arrows, card buttons, FA icons)
+- Replaced 6 emoji feature icons in `home.component.html` with mat-icon (palette, search, download, etc.)
+- Added mat-icon to 4 navbar items in `app.component.html` (menu, home, visibility, add_circle_outline)
+- Added mat-icon to 13 form buttons in `form.component.html` (navigation, delete, add, completion)
+- Created `src/assets/icon-registry.json` cataloguing all 53 applied Material Icons with file/location/replacedFrom data
+- MatIconModule added to AppModule and ResumeModule for app-wide icon support
+
+## v1.7.0 — 2026-05-26 (Minor)
+
+Bug fix: Resolved `No provider for NgControl` crash in Personal Details step by replacing `[formControl]` on a native checkbox with `formControlName` (proper reactive-forms binding inside `[formGroup]`). New features: (1) Side-panel layout — mat-stepper header hidden, custom sticky left sidebar shows section names with active highlight and click-to-navigate; (2) Month/Year-only datepicker for all Experience and Education From/To date fields via component-level `MAT_DATE_FORMATS` provider + `startView="multi-year"` + `(monthSelected)` close handler; (3) “Currently Working Here” checkbox on Experience date row — disables and nulls the To date when checked; (4) User location fields (Country, State, City, Postal Code — all optional) added to Landing Step 1 using `LocationService`; (5) Landing location pre-populates the Address field in Personal Details.
+
+---
+
+## v1.6.0 — 2026-05-26 (Minor)
+
+Constants consolidation and UX improvements: created `src/app/resume/constants/app.constants.ts` centralising `EMAIL_DOMAINS`, `AGREEMENT_TEXT`, `DECLARATION_FORMATS` (10 formats), and `GENDER_OPTIONS`. Moved email domains and agreement text from hardcoded strings in `landing.component` to constants. Added declaration format selector in Personal Details — users pick from 10 formats via dropdown, preview the text, and confirm with a checkbox. Fixed `shouldShowField` for the program field to use `EducationService.getFieldMajorOptions()` instead of the old `PROGRAMS_BY_LEVEL` key lookup, correctly gating Program Name on the normalised course level. Removed "Next Section ►" buttons from Experience and Education section headers; moved "Add Another" buttons to below the inner stepper. Inner stepper "Next" now advances to the next entry or calls submit to move to the outer stepper on the last entry. Date (From/To) fields changed from Bootstrap grid columns to flexbox layout, fixing alignment across different screen sizes.
+
+---
+
+### v1.5.1 — 2026-05-26 (Patch)
+
+Form UX improvements: all step-level buttons (Next, Delete) now render on one line using flexbox; experience date fields combined into a compact From/To row matching the education layout; removed the redundant "All Details" final step from both the experience and education inner steppers, replacing it with a "Next Section" button in the section header. Education preference country from landing Step 5 now pre-populates `institutionCountry` for every education entry (initial and added).
+
+---
+
 ### v1.5.0 — 2026-05-26 (Minor)
 
 Fixed a runtime JIT compilation crash caused by invalid Angular template syntax (`#auto{{field.id}}` in `dynamic-material-form.component.html`) and missing `MatListModule` in `SectionModule` — both caused AOT to fail silently, leaving components uncompiled at runtime. Added multi-language education preferences on landing Step 5: users can select any of 60+ country education systems to display localised education level names in the resume form, with the preference saved to sessionStorage and applied to the first education entry via `EducationService.getEducationCountries()`. Also added `courseNameOther` and `programNameOther` conditional fields that appear when "Others" is selected in the respective education dropdowns.
@@ -235,4 +289,4 @@ Initial stable release with a dynamic resume form supporting multiple education 
 
 ---
 
-**ResumeBuilder** © 2026 | Version 1.5.0
+**ResumeBuilder** © 2026 | Version 1.5.1

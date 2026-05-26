@@ -3,17 +3,17 @@
       <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
           <a class="navbar-brand" href="#">ResumeBuilder</a>
           <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
-              aria-expanded="false" aria-label="Toggle navigation"></button>
+              aria-expanded="false" aria-label="Toggle navigation"><mat-icon>menu</mat-icon></button>
           <div class="collapse navbar-collapse" id="collapsibleNavId">
               <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                   <li class="nav-item m-2">
-                      <a routerLink="/">Home</a>
+                      <a routerLink="/"><mat-icon style="font-size:16px;vertical-align:-3px">home</mat-icon> Home</a>
                   </li>
                   <li class="nav-item m-2" *ngIf="hasResumeData">
-                      <a routerLink="/resume/view" class="m-2" routerLinkActive="active">View Resume</a>
+                      <a routerLink="/resume/view" class="m-2" routerLinkActive="active"><mat-icon style="font-size:16px;vertical-align:-3px">visibility</mat-icon> View Resume</a>
                   </li>
                   <li class="nav-item m-2">
-                    <a routerLink="/resume/form" class="m-2" routerLinkActive="active">Create Resume</a>
+                    <a routerLink="/resume/form" class="m-2" routerLinkActive="active"><mat-icon style="font-size:16px;vertical-align:-3px">add_circle_outline</mat-icon> Create Resume</a>
                 </li>
               </ul>
           </div>

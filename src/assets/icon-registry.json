@@ -1,0 +1,226 @@
+{
+  "generatedAt": "2026-05-26",
+  "materialIconsFontUrl": "https://fonts.googleapis.com/icon?family=Material+Icons",
+  "icons": [
+    {
+      "iconName": "add",
+      "appliedAt": [
+        "education/achievements — Add Achievement button"
+      ]
+    },
+    {
+      "iconName": "add_circle_outline",
+      "appliedAt": [
+        "app.component.html — navbar Create Resume link",
+        "form.component.html — Add Another Experience button",
+        "form.component.html — Add Another Education button"
+      ]
+    },
+    {
+      "iconName": "arrow_back",
+      "appliedAt": [
+        "landing.component.html — step 2 footer Back button",
+        "landing.component.html — step 3 footer Back button",
+        "landing.component.html — step 4a footer Back button",
+        "landing.component.html — step 4b footer Back button",
+        "landing.component.html — step 5 footer Back button",
+        "form.component.html — Personal Details step Back button",
+        "form.component.html — Done step Back button"
+      ]
+    },
+    {
+      "iconName": "arrow_forward",
+      "appliedAt": [
+        "landing.component.html — step 1 footer Next button",
+        "landing.component.html — step 2 footer Next button",
+        "landing.component.html — step 3 footer Next button",
+        "landing.component.html — step 4a footer Next button",
+        "landing.component.html — step 4b footer Next button",
+        "form.component.html — Professional Details step Next button",
+        "form.component.html — Experience step inner stepper Next button",
+        "form.component.html — Education step inner stepper Next button",
+        "form.component.html — Personal Details step Next button"
+      ]
+    },
+    {
+      "iconName": "auto_awesome",
+      "appliedAt": [
+        "landing.component.html — step 5 Create Resume button"
+      ]
+    },
+    {
+      "iconName": "calendar_today",
+      "appliedAt": [
+        "form.component.html — experience summary panel date range",
+        "form.component.html — education summary panel date range"
+      ]
+    },
+    {
+      "iconName": "check",
+      "appliedAt": [
+        "landing.component.html — step progress done circle",
+        "landing.component.html — step 4a Confirm Summary button",
+        "landing.component.html — step 4b Confirm template flow button",
+        "landing.component.html — step 4b Confirm custom flow button"
+      ]
+    },
+    {
+      "iconName": "check_circle",
+      "appliedAt": [
+        "landing.component.html — step 4a success alert",
+        "landing.component.html — step 4b success alert",
+        "form.component.html — Done step completion heading h2",
+        "form.component.html — experience summary Review & Accept button",
+        "form.component.html — education summary Review & Accept button"
+      ]
+    },
+    {
+      "iconName": "cloud_upload",
+      "appliedAt": [
+        "landing.component.html — step 4a Upload File button",
+        "landing.component.html — step 4b Upload File button"
+      ]
+    },
+    {
+      "iconName": "delete",
+      "appliedAt": [
+        "form.component.html — Experience step Delete experience button",
+        "form.component.html — Education step Delete education button"
+      ]
+    },
+    {
+      "iconName": "description",
+      "appliedAt": [
+        "landing.component.html — step 4b Use Template button"
+      ]
+    },
+    {
+      "iconName": "download",
+      "appliedAt": [
+        "home.component.html — feature card Download Ready"
+      ]
+    },
+    {
+      "iconName": "edit",
+      "appliedAt": [
+        "landing.component.html — step 4a Write Custom Summary button",
+        "landing.component.html — step 4b Write Custom button",
+        "form.component.html — experience summary panel Edit card button",
+        "form.component.html — education summary panel Edit card button"
+      ]
+    },
+    {
+      "iconName": "edit_note",
+      "appliedAt": [
+        "home.component.html — feature card Easy to Use"
+      ]
+    },
+    {
+      "iconName": "home",
+      "appliedAt": [
+        "app.component.html — navbar Home link"
+      ]
+    },
+    {
+      "iconName": "info",
+      "appliedAt": [
+        "landing.component.html — step 5 education preferences info alert"
+      ]
+    },
+    {
+      "iconName": "library_books",
+      "appliedAt": [
+        "home.component.html — feature card Multiple Sections"
+      ]
+    },
+    {
+      "iconName": "location_on",
+      "appliedAt": [
+        "landing.component.html — step 1 location label",
+        "form.component.html — experience summary panel location",
+        "form.component.html — education summary panel location"
+      ]
+    },
+    {
+      "iconName": "menu",
+      "appliedAt": [
+        "app.component.html — navbar mobile hamburger toggle"
+      ]
+    },
+    {
+      "iconName": "palette",
+      "appliedAt": [
+        "home.component.html — feature card Professional Design"
+      ]
+    },
+    {
+      "iconName": "person",
+      "appliedAt": [
+        "landing.component.html — step 1 profile alert"
+      ]
+    },
+    {
+      "iconName": "psychology",
+      "appliedAt": [
+        "landing.component.html — step 4a AI Generated button",
+        "landing.component.html — step 4b AI Generated button"
+      ]
+    },
+    {
+      "iconName": "refresh",
+      "appliedAt": [
+        "form.component.html — Done step Create New Resume button"
+      ]
+    },
+    {
+      "iconName": "remove_circle_outline",
+      "appliedAt": [
+        "form.component.html — education achievements Remove button"
+      ]
+    },
+    {
+      "iconName": "school",
+      "appliedAt": [
+        "landing.component.html — step 2 Fresher card",
+        "form.component.html — education summary panel heading icon"
+      ]
+    },
+    {
+      "iconName": "search",
+      "appliedAt": [
+        "home.component.html — feature card Smart Location Search"
+      ]
+    },
+    {
+      "iconName": "translate",
+      "appliedAt": [
+        "home.component.html — feature card Multi-Language Education"
+      ]
+    },
+    {
+      "iconName": "visibility",
+      "appliedAt": [
+        "app.component.html — navbar View Resume link",
+        "form.component.html — Done step View My Resume button"
+      ]
+    },
+    {
+      "iconName": "warning",
+      "appliedAt": [
+        "landing.component.html — step 2 experience type warning alert"
+      ]
+    },
+    {
+      "iconName": "work",
+      "appliedAt": [
+        "landing.component.html — step 2 Experienced card"
+      ]
+    },
+    {
+      "iconName": "work_history",
+      "appliedAt": [
+        "form.component.html — experience summary panel heading icon"
+      ]
+    }
+  ]
+}

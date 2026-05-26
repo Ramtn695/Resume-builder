@@ -14,7 +14,7 @@
           [class.step-active]="currentStep === i + 1"
           [class.step-done]="currentStep > i + 1"
           [class.step-pending]="currentStep < i + 1">
-          <span *ngIf="currentStep > i + 1">&#10003;</span>
+          <span *ngIf="currentStep > i + 1"><mat-icon style="font-size:16px;line-height:18px;vertical-align:middle">check</mat-icon></span>
           <span *ngIf="currentStep <= i + 1">{{ i + 1 }}</span>
         </div>
         <small class="d-block mt-1 step-label"
@@ -79,12 +79,44 @@
         </div>
       </div>
       <div class="alert alert-info py-2 mb-0" *ngIf="firstName.trim() && lastName.trim()">
-        <strong>&#128100; Profile:</strong> {{ userDisplayName }}{{ email ? ' — ' + email : '' }}
+        <strong><mat-icon class="align-middle me-1" style="font-size:18px;vertical-align:-4px">person</mat-icon> Profile:</strong> {{ userDisplayName }}{{ email ? ' — ' + email : '' }}
+      </div>
+
+      <!-- Location (Optional) — Feature 4 -->
+      <hr class="my-3" />
+      <p class="text-muted mb-2"><strong><mat-icon class="align-middle me-1" style="font-size:18px;vertical-align:-4px">location_on</mat-icon> Your Location</strong> <span class="badge bg-secondary ms-1">Optional</span></p>
+      <div class="row g-2">
+        <div class="col-md-4">
+          <label class="form-label">Country</label>
+          <select class="form-select form-select-sm" [(ngModel)]="landingCountry" (change)="onLandingCountryChange(landingCountry)">
+            <option value="">-- Select Country --</option>
+            <option *ngFor="let c of landingCountries" [value]="c">{{ c }}</option>
+          </select>
+          <small class="text-muted d-block mt-1">This will be used on filling user address only and not for other details</small>
+        </div>
+        <div class="col-md-4" *ngIf="landingStates.length > 0">
+          <label class="form-label">State / Province</label>
+          <select class="form-select form-select-sm" [(ngModel)]="landingState" (change)="onLandingStateChange(landingState)">
+            <option value="">-- Select State --</option>
+            <option *ngFor="let s of landingStates" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+        <div class="col-md-4" *ngIf="landingCities.length > 0">
+          <label class="form-label">City</label>
+          <select class="form-select form-select-sm" [(ngModel)]="landingCity">
+            <option value="">-- Select City --</option>
+            <option *ngFor="let c of landingCities" [value]="c">{{ c }}</option>
+          </select>
+        </div>
+        <div class="col-md-3" *ngIf="landingCountry">
+          <label class="form-label">Postal Code</label>
+          <input type="text" class="form-control form-control-sm" [(ngModel)]="landingPostalCode" placeholder="e.g. 600001" />
+        </div>
       </div>
     </div>
     <div class="card-footer bg-transparent d-flex justify-content-end">
       <button class="btn btn-primary px-4" (click)="nextStep()">
-        Next <i class="fas fa-arrow-right ms-1"></i>
+        Next <mat-icon class="ms-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>
       </button>
     </div>
   </div>
@@ -107,7 +139,7 @@
               <input class="form-check-input mt-1 flex-shrink-0" type="radio"
                 [checked]="experienceType === 'experienced'" readonly>
               <div>
-                <strong>&#128188; Experienced Professional</strong>
+                <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">work</mat-icon> Experienced Professional</strong>
                 <p class="text-muted small mb-0 mt-1">I have professional work experience</p>
               </div>
             </div>
@@ -121,7 +153,7 @@
               <input class="form-check-input mt-1 flex-shrink-0" type="radio"
                 [checked]="experienceType === 'fresher'" readonly>
               <div>
-                <strong>&#127891; Fresher / Graduate</strong>
+                <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">school</mat-icon> Fresher / Graduate</strong>
                 <p class="text-muted small mb-0 mt-1">I am a fresh graduate or entry-level candidate</p>
               </div>
             </div>
@@ -129,15 +161,15 @@
         </div>
       </div>
       <div class="alert alert-warning py-2 mt-3 mb-0" *ngIf="!experienceType">
-        <small>&#9888;&#65039; Please select your experience type to continue.</small>
+        <small><mat-icon class="me-1 align-middle" style="font-size:16px;vertical-align:-3px">warning</mat-icon> Please select your experience type to continue.</small>
       </div>
     </div>
     <div class="card-footer bg-transparent d-flex justify-content-between">
       <button class="btn btn-outline-danger px-4" (click)="prevStep()">
-        <i class="fas fa-arrow-left me-1"></i> Back
+        <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_back</mat-icon> Back
       </button>
       <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!experienceType">
-        Next <i class="fas fa-arrow-right ms-1"></i>
+        Next <mat-icon class="ms-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>
       </button>
     </div>
   </div>
@@ -153,13 +185,9 @@
     <div class="card-body">
       <p class="text-muted small mb-3">
         <span *ngIf="userDisplayName"><strong>Agreement for: {{ userDisplayName }}</strong><br /></span>
-        {{ experienceType === 'experienced'
-          ? 'As an experienced professional, I understand my resume will be shared with employers.'
-          : 'As a fresher, I understand my resume will be used for job applications.' }}
+        {{ experienceType === 'experienced' ? agreementText.experienced : agreementText.fresher }}
         <br /><br />
-        This will be an AI generated resume based on the information I provide. I will review the generated
-        content for accuracy. I acknowledge that the resume builder is a tool to assist in creating my resume,
-        and I am responsible for the final content and its use.
+        {{ agreementText.common }}
       </p>
       <div class="form-check p-3 border rounded"
         [class.border-success]="agreeToTerms"
@@ -181,10 +209,10 @@
     </div>
     <div class="card-footer bg-transparent d-flex justify-content-between">
       <button class="btn btn-outline-danger px-4" (click)="prevStep()">
-        <i class="fas fa-arrow-left me-1"></i> Back
+        <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_back</mat-icon> Back
       </button>
       <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!agreeToTerms">
-        Next <i class="fas fa-arrow-right ms-1"></i>
+        Next <mat-icon class="ms-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>
       </button>
     </div>
   </div>
@@ -207,7 +235,7 @@
             (click)="onProfessionalSummaryTypeChange('custom')">
             <input class="form-check-input me-2" type="radio"
               [checked]="professionalSummaryType === 'custom'" readonly>
-            <strong>&#9997;&#65039; Write Custom</strong>
+            <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">edit</mat-icon> Write Custom</strong>
             <p class="text-muted small mb-0 mt-1">Write your own summary</p>
           </div>
         </div>
@@ -217,14 +245,14 @@
             (click)="onProfessionalSummaryTypeChange('upload')">
             <input class="form-check-input me-2" type="radio"
               [checked]="professionalSummaryType === 'upload'" readonly>
-            <strong>&#128196; Upload File</strong>
+            <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">cloud_upload</mat-icon> Upload File</strong>
             <p class="text-muted small mb-0 mt-1">.txt, .doc, .docx</p>
           </div>
         </div>
         <div class="col-md-4">
           <div class="p-3 border rounded h-100 option-future">
             <input class="form-check-input me-2" type="radio" disabled>
-            <strong>&#129302; AI Generated</strong>
+            <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">psychology</mat-icon> AI Generated</strong>
             <span class="badge bg-secondary ms-1">Future Phase</span>
             <p class="text-muted small mb-0 mt-1">AI-powered summary (coming soon)</p>
           </div>
@@ -243,7 +271,7 @@
             (click)="professionalSummary = ''; professionalSummaryCompleted = false"
             [disabled]="!professionalSummary">Clear</button>
           <button class="btn btn-success btn-sm" (click)="completeProfessionalSummary()"
-            [disabled]="!professionalSummary.trim()">&#10003; Confirm Summary</button>
+            [disabled]="!professionalSummary.trim()"><mat-icon class="me-1 align-middle" style="font-size:16px;vertical-align:-3px">check</mat-icon> Confirm Summary</button>
         </div>
       </div>
 
@@ -260,15 +288,15 @@
       </div>
 
       <div class="alert alert-success mt-3 mb-0" *ngIf="professionalSummaryCompleted">
-        &#10003; Professional Summary is ready!
+        <mat-icon class="me-1 align-middle" style="font-size:16px;vertical-align:-3px">check_circle</mat-icon> Professional Summary is ready!
       </div>
     </div>
     <div class="card-footer bg-transparent d-flex justify-content-between">
       <button class="btn btn-outline-danger px-4" (click)="prevStep()">
-        <i class="fas fa-arrow-left me-1"></i> Back
+        <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_back</mat-icon> Back
       </button>
       <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!professionalSummaryCompleted">
-        Next <i class="fas fa-arrow-right ms-1"></i>
+        Next <mat-icon class="ms-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>
       </button>
     </div>
   </div>
@@ -291,7 +319,7 @@
             (click)="onCareerObjectiveTypeChange('template')">
             <input class="form-check-input me-2" type="radio"
               [checked]="careerObjectiveType === 'template'" readonly>
-            <strong>&#128196; Use Template</strong>
+            <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">description</mat-icon> Use Template</strong>
             <p class="text-muted small mb-0 mt-1">Pick from curated objectives</p>
           </div>
         </div>
@@ -301,7 +329,7 @@
             (click)="onCareerObjectiveTypeChange('custom')">
             <input class="form-check-input me-2" type="radio"
               [checked]="careerObjectiveType === 'custom'" readonly>
-            <strong>&#9997;&#65039; Write Custom</strong>
+            <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">edit</mat-icon> Write Custom</strong>
             <p class="text-muted small mb-0 mt-1">Write your own objective</p>
           </div>
         </div>
@@ -311,14 +339,14 @@
             (click)="onCareerObjectiveTypeChange('upload')">
             <input class="form-check-input me-2" type="radio"
               [checked]="careerObjectiveType === 'upload'" readonly>
-            <strong>&#128196; Upload File</strong>
+            <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">cloud_upload</mat-icon> Upload File</strong>
             <p class="text-muted small mb-0 mt-1">.txt, .doc, .docx</p>
           </div>
         </div>
         <div class="col-md-3">
           <div class="p-3 border rounded h-100 option-future">
             <input class="form-check-input me-2" type="radio" disabled>
-            <strong>&#129302; AI Generated</strong>
+            <strong><mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">psychology</mat-icon> AI Generated</strong>
             <span class="badge bg-secondary ms-1">Future Phase</span>
             <p class="text-muted small mb-0 mt-1">Coming soon</p>
           </div>
@@ -364,7 +392,7 @@
         <div class="d-flex gap-2 flex-wrap" *ngIf="careerObjectiveText">
           <button class="btn btn-outline-secondary btn-sm" (click)="clearCareerObjective()">Clear</button>
           <button class="btn btn-success btn-sm" (click)="completeCareerObjective()"
-            [disabled]="!careerObjectiveText">&#10003; Confirm</button>
+              [disabled]="!careerObjectiveText"><mat-icon class="me-1 align-middle" style="font-size:16px;vertical-align:-3px">check</mat-icon> Confirm</button>
         </div>
       </div>
 
@@ -377,7 +405,7 @@
         <div class="d-flex gap-2" *ngIf="careerObjectiveText">
           <button class="btn btn-outline-secondary btn-sm" (click)="clearCareerObjective()">Clear</button>
           <button class="btn btn-success btn-sm" (click)="completeCareerObjective()"
-            [disabled]="!careerObjectiveText">&#10003; Confirm</button>
+              [disabled]="!careerObjectiveText"><mat-icon class="me-1 align-middle" style="font-size:16px;vertical-align:-3px">check</mat-icon> Confirm</button>
         </div>
       </div>
 
@@ -393,15 +421,15 @@
       </div>
 
       <div class="alert alert-success mt-3 mb-0" *ngIf="careerObjectiveCompleted">
-        &#10003; Career Objective is ready!
+        <mat-icon class="me-1 align-middle" style="font-size:16px;vertical-align:-3px">check_circle</mat-icon> Career Objective is ready!
       </div>
     </div>
     <div class="card-footer bg-transparent d-flex justify-content-between">
       <button class="btn btn-outline-danger px-4" (click)="prevStep()">
-        <i class="fas fa-arrow-left me-1"></i> Back
+        <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_back</mat-icon> Back
       </button>
       <button class="btn btn-primary px-4" (click)="nextStep()" [disabled]="!careerObjectiveCompleted">
-        Next <i class="fas fa-arrow-right ms-1"></i>
+        Next <mat-icon class="ms-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>
       </button>
     </div>
   </div>
@@ -416,7 +444,7 @@
     </div>
     <div class="card-body">
       <div class="alert alert-info py-2 mb-4">
-        <i class="fas fa-info-circle me-2"></i>
+        <mat-icon class="me-2 align-middle" style="font-size:18px;vertical-align:-4px">info</mat-icon>
         <strong>Optional:</strong> Select your country's education system to display education levels in your local format.
         This applies to your <strong>first education entry</strong>. Additional entries can be configured individually.
         Leaving it as default uses the international (English) format.
@@ -473,10 +501,10 @@
     </div>
     <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
       <button class="btn btn-outline-secondary px-4" (click)="prevStep()">
-        <i class="fas fa-arrow-left me-1"></i> Back
+        <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_back</mat-icon> Back
       </button>
       <button class="btn btn-success btn-lg px-5" (click)="proceedToForm()" [disabled]="!canProceed()">
-        &#127775; Create Resume
+        <mat-icon class="me-2 align-middle" style="font-size:20px;vertical-align:-5px">auto_awesome</mat-icon> Create Resume
       </button>
     </div>
   </div>

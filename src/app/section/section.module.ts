@@ -6,7 +6,6 @@ import { DynamicMaterialFormComponent } from './dynamic-material-form/dynamic-ma
 
 // Angular Material modules (compatible with Angular 10)
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -29,7 +28,6 @@ import { FormLayoutComponent } from './form-layout/form-layout.component';
     ReactiveFormsModule,
     FormsModule,
     MatTabsModule,
-    MatStepperModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,

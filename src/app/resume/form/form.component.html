@@ -1,480 +1,538 @@
-<div class="container mt-5">
-  <mat-horizontal-stepper #stepper *ngIf="professionalForm">
-    <mat-step *ngIf="professionalForm">
-      <form
-        [formGroup]="professionalForm"
-        (ngSubmit)="onSubmit()"
-        class="needs-validation"
-        novalidate
-      >
-        <ng-template matStepLabel>
-          <h3>Professional Details</h3>
-        </ng-template>
-        <section>
-          <app-text-input
-            [type]="'text'"
-            [fieldName]="'firstName'"
-            [formControl]="professionalForm.get('firstName')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'text'"
-            [fieldName]="'middleName'"
-            [formControl]="professionalForm.get('middleName')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'text'"
-            [fieldName]="'lastName'"
-            [formControl]="professionalForm.get('lastName')"
-          ></app-text-input>
-
-          <!-- Profile Type - prefilled from landing page -->
-          <div class="mb-3">
-            <label class="form-label fw-bold">Profile Type</label>
-            <div class="form-control bg-light text-secondary">
-              <span *ngIf="professionalForm.get('expOrFresher')?.value === 'experienced'">✓ Experienced Professional</span>
-              <span *ngIf="professionalForm.get('expOrFresher')?.value === 'fresher'">✓ Fresher / Graduate</span>
-            </div>
-          </div>
-
-          <app-text-input
-            [type]="'text'"
-            [fieldName]="'jobTitle'"
-            [formControl]="professionalForm.get('jobTitle')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'email'"
-            [fieldName]="'email'"
-            [formControl]="professionalForm.get('email')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'number'"
-            [fieldName]="'phoneNumber'"
-            [formControl]="professionalForm.get('phoneNumber')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'textarea'"
-            [fieldName]="'summary'"
-            [formControl]="professionalForm.get('summary')"
-          ></app-text-input>
-
-          <!-- Skills Summary Section -->
-          <div class="skills-section mt-4">
-            <label class="form-label"><strong>Skills Summary</strong> (Bullet Points)</label>
-            <div formArrayName="skillsSummary">
-              <div *ngFor="let skill of getSkillsSummary().controls; let i = index" class="input-group mb-2">
-                <input
-                  type="text"
-                  class="form-control"
-                  [formControl]="getSkillsSummary().at(i)"
-                  placeholder="Add a skill"
-                >
-                <button
-                  type="button"
-                  class="btn btn-danger"
-                  (click)="removeSkillSummary(i)"
-                  *ngIf="getSkillsSummary().length > 0"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-            <button
-              type="button"
-              class="btn btn-secondary btn-sm"
-              (click)="addSkillSummary()"
-            >
-              + Add Skill
-            </button>
-          </div>
-
-          <!-- Skills Known Section (Future Phase) -->
-          <div class="skills-known-section mt-4">
-            <label class="form-label"><strong>Skills Known</strong> (Future Phase - Display Recommended Skills)</label>
-            <small class="text-muted d-block mb-2">This section will show relevant skills based on job title in future releases</small>
-            <div formArrayName="skillsKnown">
-              <div *ngFor="let skill of getSkillsKnown().controls; let i = index" class="input-group mb-2">
-                <input
-                  type="text"
-                  class="form-control"
-                  [formControl]="getSkillsKnown().at(i)"
-                  placeholder="Add a known skill"
-                  disabled
-                >
-                <button
-                  type="button"
-                  class="btn btn-danger"
-                  (click)="removeSkillKnown(i)"
-                  *ngIf="getSkillsKnown().length > 0"
-                  disabled
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <button
-          type="submit"
-          class="btn btn-primary mt-3"
-          matStepperForward
-          [disabled]="professionalForm.invalid"
-          (submit)="onSubmit(stepper)"
-          (click)="stepper.next()"
-        >
-          Next
-        </button>
-      </form>
-    </mat-step>
-    <mat-step *ngIf="experienceForm && isExperienced">
-      <ng-template matStepLabel>
-        <h3>Experience Details</h3>
-      </ng-template>
-      <div class="mb-3">
-        <button
-          class="btn btn-primary mb-3"
-          type="button"
-          (click)="addExperience()"
-          [disabled]="(experienceForm.get('experiences')['controls'].length >= maxExperiences)"
-        >
-          + Add Another Experience
-        </button>
+<div class="container-fluid mt-3">
+  <div class="row gx-0">
+    <!-- Section navigation sidebar (visible on md+ screens) -->
+    <div class="col-md-3 col-lg-2 d-none d-md-block">
+      <div class="form-section-nav">
+        <div *ngFor="let label of getVisibleFormSteps(); let i = index" class="form-section-nav-item"
+          [class.active]="formStepIndex === i" (click)="goToStep(i)">
+          <span class="section-num">{{ i + 1 }}</span>
+          <span class="section-label ms-2">{{ label }}</span>
+        </div>
       </div>
-      <mat-horizontal-stepper linear #stepper2>
-        <form
-          *ngFor="
+    </div>
+    <!-- Form content -->
+    <div class="col-12 col-md-9 col-lg-10">
+      <!-- Loading spinner (shown before forms are initialised) -->
+      <div *ngIf="isLoading" class="d-flex flex-column align-items-center justify-content-center"
+        style="min-height:350px">
+        <mat-spinner diameter="52"></mat-spinner>
+        <p class="text-muted mt-3 mb-0">Preparing your form&hellip;</p>
+      </div>
+      <mat-horizontal-stepper #stepper *ngIf="!isLoading" (selectionChange)="onStepChange($event)">
+        <mat-step>
+          <form [formGroup]="professionalForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+            <ng-template matStepLabel>
+              <h3>Professional Details</h3>
+            </ng-template>
+            <section>
+              <app-text-input [type]="'text'" [fieldName]="'firstName'"
+                [formControl]="professionalForm.get('firstName')"></app-text-input>
+
+              <app-text-input [type]="'text'" [fieldName]="'middleName'"
+                [formControl]="professionalForm.get('middleName')"></app-text-input>
+
+              <app-text-input [type]="'text'" [fieldName]="'lastName'"
+                [formControl]="professionalForm.get('lastName')"></app-text-input>
+
+              <!-- Profile Type - prefilled from landing page -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Profile Type</label>
+                <div class="form-control bg-light text-secondary">
+                  <span *ngIf="professionalForm.get('expOrFresher')?.value === 'experienced'">✓ Experienced
+                    Professional</span>
+                  <span *ngIf="professionalForm.get('expOrFresher')?.value === 'fresher'">✓ Fresher / Graduate</span>
+                </div>
+              </div>
+
+              <app-text-input [type]="'text'" [fieldName]="'jobTitle'"
+                [formControl]="professionalForm.get('jobTitle')"></app-text-input>
+
+              <app-text-input [type]="'email'" [fieldName]="'email'"
+                [formControl]="professionalForm.get('email')"></app-text-input>
+
+              <app-text-input [type]="'number'" [fieldName]="'phoneNumber'"
+                [formControl]="professionalForm.get('phoneNumber')"></app-text-input>
+
+              <app-text-input [type]="'textarea'" [fieldName]="'summary'"
+                [formControl]="professionalForm.get('summary')"></app-text-input>
+
+              <!-- Skills Summary Section -->
+              <div class="skills-section mt-4">
+                <label class="form-label"><strong>Skills Summary</strong> (Bullet Points)</label>
+                <div formArrayName="skillsSummary">
+                  <div *ngFor="let skill of getSkillsSummary().controls; let i = index" class="input-group mb-2">
+                    <input type="text" class="form-control" [formControl]="getSkillsSummary().at(i)"
+                      placeholder="Add a skill">
+                    <button type="button" class="btn btn-danger" (click)="removeSkillSummary(i)"
+                      *ngIf="getSkillsSummary().length > 0">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="addSkillSummary()">
+                  + Add Skill
+                </button>
+              </div>
+
+              <!-- Skills Known Section (Future Phase) -->
+              <div class="skills-known-section mt-4">
+                <label class="form-label"><strong>Skills Known</strong> (Future Phase - Display Recommended
+                  Skills)</label>
+                <small class="text-muted d-block mb-2">This section will show relevant skills based on job title in
+                  future releases</small>
+                <div formArrayName="skillsKnown">
+                  <div *ngFor="let skill of getSkillsKnown().controls; let i = index" class="input-group mb-2">
+                    <input type="text" class="form-control" [formControl]="getSkillsKnown().at(i)"
+                      placeholder="Add a known skill" disabled>
+                    <button type="button" class="btn btn-danger" (click)="removeSkillKnown(i)"
+                      *ngIf="getSkillsKnown().length > 0" disabled>
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <button type="submit" class="btn btn-primary mt-3" matStepperForward [disabled]="professionalForm.invalid"
+              (submit)="onSubmit(stepper)" (click)="stepper.next()">
+              Next <mat-icon class="ms-1 align-middle"
+                style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>
+            </button>
+          </form>
+        </mat-step>
+        <mat-step *ngIf="experienceForm && isExperienced">
+          <ng-template matStepLabel>
+            <h3>Experience Details</h3>
+          </ng-template>
+
+          <!-- Experience Summary Panel (shown after all entries reviewed) -->
+          <div *ngIf="showExperienceSummary" class="summary-panel mt-3">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <mat-icon class="text-primary" style="font-size:22px">work_history</mat-icon>
+              <h5 class="mb-0">Review Your Experience</h5>
+            </div>
+            <div *ngFor="let exp of getExperienceEntries(); let i = index" class="card mb-3 border-0 shadow-sm">
+              <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <strong style="font-size:18px">{{ getEntryValue(exp, 'companyName') }} &mdash; {{ getEntryValue(exp, 'designation') }}</strong>
+                <button class="btn btn-sm btn-light" type="button" (click)="editExperience(i)">
+                  <mat-icon style="font-size:16px;vertical-align:-3px">edit</mat-icon> Edit
+                </button>
+              </div>
+              <div class="card-body py-2">
+                <div class="text-muted mb-1" style="font-size:16px">
+                  <mat-icon style="font-size:16px;vertical-align:-3px">location_on</mat-icon>
+                  {{ getEntryValue(exp, 'companyCity') }}{{ getEntryValue(exp, 'companyState') ? ', ' +
+                  getEntryValue(exp, 'companyState') : '' }}{{ getEntryValue(exp, 'companyCountry') ? ', ' +
+                  getEntryValue(exp, 'companyCountry') : '' }}
+                </div>
+                <div class="text-muted mb-2" style="font-size:14px">
+                  <mat-icon style="font-size:14px;vertical-align:-3px">calendar_today</mat-icon>
+                  {{ getEntryValue(exp, 'dateFrom') | date:'MMM yyyy' }} &mdash;
+                  {{ getEntryValue(exp, 'currentlyWorking') ? 'Present' : (getEntryValue(exp, 'dateTo') | date:'MMM
+                  yyyy') }}
+                </div>
+                <div style="font-size:14px">{{ getEntryValue(exp, 'responsibilities') }}</div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
+              <button class="btn btn-success" type="button" (click)="acceptExperienceSummary(stepper)">
+                <mat-icon class="me-1 align-middle"
+                  style="font-size:18px;vertical-align:-4px">check_circle</mat-icon>Review &amp; Accept
+              </button>
+            </div>
+          </div>
+
+          <!-- Entry forms (preserved in DOM via [hidden] to keep stepper2 ref) -->
+          <div [hidden]="showExperienceSummary">
+            <mat-horizontal-stepper linear #stepper2>
+              <form *ngFor="
             let experience of experienceForm.get('experiences')['controls'];
             let i = index
-          "
-          [formGroup]="experienceForm.get('experiences')['controls'][i]"
-          (ngSubmit)="onExperienceSubmit(stepper)"
-          class="needs-validation"
-          novalidate
-        >
-          <mat-step
-            [stepControl]="experienceForm.get('experiences')['controls'][i]"
-          >
-            <ng-template matStepLabel>Experience {{ i + 1 }}</ng-template>
-            <div class="container-fluid">
-              <section>
-                <!-- Dynamic field rendering based on ExperienceFormField -->
-                <ng-container *ngFor="let field of getExperienceFields(); let j = index">
-                  <!-- Show field only if dependencies are met -->
-                  <ng-container *ngIf="shouldShowField(field, experience)">
+          " [formGroup]="experienceForm.get('experiences')['controls'][i]" (ngSubmit)="onExperienceSubmit(stepper)"
+                class="needs-validation" novalidate>
+                <mat-step [stepControl]="experienceForm.get('experiences')['controls'][i]">
+                  <ng-template matStepLabel>Experience {{ i + 1 }}</ng-template>
+                  <div class="container-fluid">
+                    <section>
+                      <!-- Dynamic field rendering based on ExperienceFormField -->
+                      <ng-container *ngFor="let field of getExperienceFields(); let j = index">
+                        <!-- Show field only if dependencies are met -->
+                        <ng-container *ngIf="shouldShowField(field, experience)">
 
-                    <!-- Text Input Fields -->
-                    <app-text-input
-                      *ngIf="field.fieldType === 'text'"
-                      [type]="'text'"
-                      [fieldName]="field.id"
-                      [formControl]="experience.get(field.id)"
-                      [placeholder]="getFieldLabel(field)"
-                    ></app-text-input>
+                          <!-- Text Input Fields -->
+                          <app-text-input *ngIf="field.fieldType === 'text'" [type]="'text'" [fieldName]="field.id"
+                            [formControl]="experience.get(field.id)"
+                            [placeholder]="getFieldLabel(field)"></app-text-input>
 
-                    <!-- Select Fields (Dropdown) -->
-                    <app-text-select
-                      *ngIf="field.fieldType === 'select'"
-                      [type]="'select'"
-                      [fieldName]="field.id"
-                      [values]="getFieldValues(field, experience, i)"
-                      [formControl]="experience.get(field.id)"
-                      (setSelected)="onDynamicFieldChange(field.id, $event[0] || $event, experience, i)"
-                    ></app-text-select>
+                          <!-- Select Fields (Dropdown) -->
+                          <app-text-select *ngIf="field.fieldType === 'select'" [type]="'select'" [fieldName]="field.id"
+                            [values]="getFieldValues(field, experience, i)" [formControl]="experience.get(field.id)"
+                            (setSelected)="onDynamicFieldChange(field.id, $event[0] || $event, experience, i)"></app-text-select>
 
-                    <!-- Date Input Fields with Material Calendar -->
-                    <mat-form-field *ngIf="field.fieldType === 'date'" class="w-100 mb-3">
-                      <mat-label>{{ getFieldLabel(field) }}</mat-label>
-                      <input 
-                        matInput 
-                        [matDatepicker]="datePicker"
-                        [formControl]="experience.get(field.id)"
-                        readonly
-                      />
-                      <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
-                      <mat-datepicker #datePicker="matDatepicker"></mat-datepicker>
-                      <mat-error *ngIf="experience.get(field.id)?.hasError('required')">
-                        {{ getFieldLabel(field) }} is required
-                      </mat-error>
-                    </mat-form-field>
+                          <!-- Date Input Fields: dateFrom + dateTo on the same compact row -->
+                          <div *ngIf="field.fieldType === 'date' && field.id === 'dateFrom'"
+                            class="d-flex align-items-start gap-2 mb-2 flex-wrap">
+                            <mat-form-field appearance="outline" style="flex: 1 1 180px; max-width: 220px;">
+                              <mat-label>From</mat-label>
+                              <input matInput [matDatepicker]="expFromPicker" [formControl]="experience.get('dateFrom')"
+                                readonly />
+                              <mat-datepicker-toggle matSuffix [for]="expFromPicker"></mat-datepicker-toggle>
+                              <mat-datepicker #expFromPicker startView="multi-year"
+                                (monthSelected)="selectMonthYear($event, expFromPicker, experience.get('dateFrom'))">
+                              </mat-datepicker>
+                              <mat-error *ngIf="experience.get('dateFrom')?.hasError('required')">Required</mat-error>
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" style="flex: 1 1 180px; max-width: 220px;"
+                              [class.opacity-50]="experience.get('currentlyWorking')?.value">
+                              <mat-label>To</mat-label>
+                              <input matInput [matDatepicker]="expToPicker" [formControl]="experience.get('dateTo')"
+                                readonly />
+                              <mat-datepicker-toggle matSuffix [for]="expToPicker"></mat-datepicker-toggle>
+                              <mat-datepicker #expToPicker startView="multi-year"
+                                (monthSelected)="selectMonthYear($event, expToPicker, experience.get('dateTo'))">
+                              </mat-datepicker>
+                              <mat-error *ngIf="experience.get('dateTo')?.hasError('required')">Required</mat-error>
+                            </mat-form-field>
+                            <div class="d-flex align-items-center gap-2 align-self-center mt-1">
+                              <input type="checkbox" class="form-check-input" id="cwCheck_{{ i }}"
+                                formControlName="currentlyWorking"
+                                (change)="onCurrentlyWorkingChange(experience, $event)" />
+                              <label class="form-check-label small" [for]="'cwCheck_' + i">Currently Working
+                                Here</label>
+                            </div>
+                          </div>
+                          <ng-container *ngIf="field.fieldType === 'date' && field.id === 'dateTo'"></ng-container>
 
-                    <!-- Textarea Fields -->
-                    <div *ngIf="field.fieldType === 'textarea'" class="mb-3">
-                      <label class="form-label">{{ getFieldLabel(field) }}</label>
-                      <textarea
-                        class="form-control"
-                        [formControl]="experience.get(field.id)"
-                        rows="4"
-                      ></textarea>
-                      <div class="text-danger" *ngIf="experience.get(field.id)?.invalid && experience.get(field.id)?.touched">
-                        {{ getFieldLabel(field) }} is required
-                      </div>
-                    </div>
+                          <!-- Textarea Fields -->
+                          <div *ngIf="field.fieldType === 'textarea'" class="mb-3">
+                            <label class="form-label">{{ getFieldLabel(field) }}</label>
+                            <textarea class="form-control" [formControl]="experience.get(field.id)" rows="4"></textarea>
+                            <div class="text-danger"
+                              *ngIf="experience.get(field.id)?.invalid && experience.get(field.id)?.touched">
+                              {{ getFieldLabel(field) }} is required
+                            </div>
+                          </div>
 
-                  </ng-container>
-                </ng-container>
-              </section>
+                        </ng-container>
+                      </ng-container>
+                    </section>
+                  </div>
+                  <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-primary" type="button"
+                      (click)="onExperienceNext(stepper, stepper2, i, experience)"><mat-icon class="me-1 align-middle"
+                        style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>Next</button>
+                    <button class="btn btn-danger" type="button" (click)="removeExperience(i)"
+                      [disabled]="(experienceForm.get('experiences')['controls'].length <= 1)"><mat-icon
+                        class="me-1 align-middle"
+                        style="font-size:18px;vertical-align:-4px">delete</mat-icon>Delete</button>
+                  </div>
+                </mat-step>
+              </form>
+            </mat-horizontal-stepper>
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <button class="btn btn-outline-primary" type="button" (click)="addExperience()"
+                [disabled]="(experienceForm.get('experiences')['controls'].length >= maxExperiences)"><mat-icon
+                  class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">add_circle_outline</mat-icon>Add
+                Another Experience</button>
             </div>
-            <div>
-              <button
-                class="btn btn-primary m-2 d-block"
-                matStepperNext
-                (click)="markAllTouched(experience)"
-              >
-                Next
-              </button>
-              <button
-                class="btn btn-danger m-2 d-block"
-                type="button"
-                (click)="removeExperience(i)"
-                [disabled]="(experienceForm.get('experiences')['controls'].length <= 1)"
-              >
-                Delete Experience
-              </button>
-            </div>
-          </mat-step>
-        </form>
-        <mat-step>
-          <ng-template matStepLabel>All Details</ng-template>
-          <p>All experiences filled!</p>
-          <button matStepperPrevious class="btn btn-secondary m-2">Back</button>
-          <button
-            class="btn btn-primary m-2"
-            type="button"
-            (click)="onExperienceSubmit(stepper)"
-            [disabled]="experienceForm.invalid"
-            matStepperForward
-          >
-            Submit All
-          </button>
+          </div><!-- /[hidden] experience forms -->
         </mat-step>
-      </mat-horizontal-stepper>
-    </mat-step>
-    <mat-step *ngIf="educationForm">
-      <ng-template matStepLabel>
-        <h3>Education Details</h3>
-      </ng-template>
-      <div class="mb-3">
-        <button
-          class="btn btn-primary mb-3"
-          type="button"
-          (click)="addEducation()"
-          [disabled]="(educationForm.get('educations')['controls'].length >= maxEducations)"
-        >
-          + Add Another Education
-        </button>
-      </div>
-      <mat-horizontal-stepper linear #stepper3>
-        <form
-          *ngFor="
+        <mat-step>
+          <ng-template matStepLabel>
+            <h3>Education Details</h3>
+          </ng-template>
+
+          <!-- Education Summary Panel (shown after all entries reviewed) -->
+          <div *ngIf="showEducationSummary" class="summary-panel mt-3">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <mat-icon class="text-primary" style="font-size:22px">school</mat-icon>
+              <h5 class="mb-0">Review Your Education</h5>
+            </div>
+            <div *ngFor="let edu of getEducationEntries(); let i = index" class="card mb-3 border-0 shadow-sm">
+              <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <strong style="font-size:18px">{{ getEntryValue(edu, 'courseName') }}{{ getEntryValue(edu, 'programName') ? ' / ' +
+                  getEntryValue(edu, 'programName') : '' }}</strong>
+                <button class="btn btn-sm btn-light" type="button" (click)="editEducation(i)">
+                  <mat-icon style="font-size:16px;vertical-align:-3px">edit</mat-icon> Edit
+                </button>
+              </div>
+              <div class="card-body py-2">
+                <div class="fw-semibold" style="font-size:16px">{{ getEntryValue(edu, 'institutionName') }}</div>
+                <div class="text-muted mb-1" style="font-size:14px">
+                  <mat-icon style="font-size:14px;vertical-align:-3px">location_on</mat-icon>
+                  {{ getEntryValue(edu, 'institutionCity') }}{{ getEntryValue(edu, 'institutionState') ? ', ' +
+                  getEntryValue(edu, 'institutionState') : '' }}{{ getEntryValue(edu, 'institutionCountry') ? ', ' +
+                  getEntryValue(edu, 'institutionCountry') : '' }}
+                </div>
+                <div class="text-muted mb-1" style="font-size:14px">
+                  <mat-icon style="font-size:14px;vertical-align:-3px">calendar_today</mat-icon>
+                  {{ getEntryValue(edu, 'dateFrom') | date:'MMM yyyy' }} &mdash; {{ getEntryValue(edu, 'dateTo') |
+                  date:'MMM yyyy' }}
+                </div>
+                <div style="font-size:14px">CGPA/Percentage: <strong>{{ getEntryValue(edu, 'percentage') }}</strong></div>
+                <ng-container *ngIf="getAchievements(i).controls.length > 0">
+                  <div class="mt-1" style="font-size:14px">
+                    <span class="fw-semibold">Achievements:</span>
+                    <ul class="mb-0 mt-1 ps-3">
+                      <li *ngFor="let ach of getAchievements(i).controls">{{ ach.value }}</li>
+                    </ul>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
+              <button class="btn btn-success" type="button" (click)="acceptEducationSummary(stepper)">
+                <mat-icon class="me-1 align-middle"
+                  style="font-size:18px;vertical-align:-4px">check_circle</mat-icon>Review &amp; Accept
+              </button>
+            </div>
+          </div>
+
+          <!-- Entry forms (preserved in DOM via [hidden] to keep stepper3 ref) -->
+          <div [hidden]="showEducationSummary">
+            <mat-horizontal-stepper linear #stepper3>
+              <form *ngFor="
             let education of educationForm.get('educations')['controls'];
             let i = index
-          "
-          [formGroup]="educationForm.get('educations')['controls'][i]"
-          (ngSubmit)="onEducationSubmit(stepper)"
-          class="needs-validation"
-          novalidate
-        >
-          <mat-step
-            [stepControl]="educationForm.get('educations')['controls'][i]"
-          >
-            <ng-template matStepLabel>Education {{ i + 1 }}</ng-template>
-            <div class="container-fluid">
-              <section>
-                <!-- Dynamic field rendering based on EducationFormField -->
-                <ng-container *ngFor="let field of getEducationFields(); let j = index">
-                  <!-- Show field only if dependencies are met -->
-                  <ng-container *ngIf="shouldShowField(field, education)">
+          " [formGroup]="educationForm.get('educations')['controls'][i]" (ngSubmit)="onEducationSubmit(stepper)"
+                class="needs-validation" novalidate>
+                <mat-step [stepControl]="educationForm.get('educations')['controls'][i]">
+                  <ng-template matStepLabel>Education {{ i + 1 }}</ng-template>
+                  <div class="container-fluid">
+                    <section>
+                      <!-- Dynamic field rendering based on EducationFormField -->
+                      <ng-container *ngFor="let field of getEducationFields(); let j = index">
+                        <!-- Show field only if dependencies are met -->
+                        <ng-container *ngIf="shouldShowField(field, education)">
 
-                    <!-- Text Input Fields -->
-                    <app-text-input
-                      *ngIf="field.fieldType === 'text'"
-                      [type]="'text'"
-                      [fieldName]="field.id"
-                      [formControl]="education.get(field.id)"
-                      [placeholder]="getFieldLabel(field)"
-                    ></app-text-input>
+                          <!-- Text Input Fields -->
+                          <app-text-input *ngIf="field.fieldType === 'text'" [type]="'text'" [fieldName]="field.id"
+                            [formControl]="education.get(field.id)"
+                            [placeholder]="getFieldLabel(field)"></app-text-input>
 
-                    <!-- Select Fields (Dropdown) -->
-                    <app-text-select
-                      *ngIf="field.fieldType === 'select'"
-                      [type]="'select'"
-                      [fieldName]="field.id"
-                      [values]="getFieldValues(field, education, i)"
-                      [formControl]="education.get(field.id)"
-                      (setSelected)="onDynamicFieldChange(field.id, $event[0] || $event, education, i)"
-                    ></app-text-select>
+                          <!-- Select Fields (Dropdown) -->
+                          <app-text-select *ngIf="field.fieldType === 'select'" [type]="'select'" [fieldName]="field.id"
+                            [values]="getFieldValues(field, education, i)" [formControl]="education.get(field.id)"
+                            (setSelected)="onDynamicFieldChange(field.id, $event[0] || $event, education, i)"></app-text-select>
 
-                    <!-- Date Input Fields: dateFrom + dateTo on the same row -->
-                    <div *ngIf="field.fieldType === 'date' && field.id === 'dateFrom'" class="row mb-3">
-                      <div class="col-6">
-                        <mat-form-field class="w-100">
-                          <mat-label>From Date</mat-label>
-                          <input matInput [matDatepicker]="eduFromPicker" [formControl]="education.get('dateFrom')" readonly />
-                          <mat-datepicker-toggle matSuffix [for]="eduFromPicker"></mat-datepicker-toggle>
-                          <mat-datepicker #eduFromPicker="matDatepicker"></mat-datepicker>
-                          <mat-error *ngIf="education.get('dateFrom')?.hasError('required')">From Date is required</mat-error>
-                        </mat-form-field>
+                          <!-- Date Input Fields: dateFrom + dateTo compact row -->
+                          <div *ngIf="field.fieldType === 'date' && field.id === 'dateFrom'"
+                            class="d-flex align-items-start gap-2 mb-2 flex-wrap">
+                            <mat-form-field appearance="outline" style="flex: 1 1 180px; max-width: 220px;">
+                              <mat-label>From</mat-label>
+                              <input matInput [matDatepicker]="eduFromPicker" [formControl]="education.get('dateFrom')"
+                                readonly />
+                              <mat-datepicker-toggle matSuffix [for]="eduFromPicker"></mat-datepicker-toggle>
+                              <mat-datepicker #eduFromPicker startView="multi-year"
+                                (monthSelected)="selectMonthYear($event, eduFromPicker, education.get('dateFrom'))">
+                              </mat-datepicker>
+                              <mat-error *ngIf="education.get('dateFrom')?.hasError('required')">Required</mat-error>
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" style="flex: 1 1 180px; max-width: 220px;">
+                              <mat-label>To</mat-label>
+                              <input matInput [matDatepicker]="eduToPicker" [formControl]="education.get('dateTo')"
+                                readonly />
+                              <mat-datepicker-toggle matSuffix [for]="eduToPicker"></mat-datepicker-toggle>
+                              <mat-datepicker #eduToPicker startView="multi-year"
+                                (monthSelected)="selectMonthYear($event, eduToPicker, education.get('dateTo'))">
+                              </mat-datepicker>
+                              <mat-error *ngIf="education.get('dateTo')?.hasError('required')">Required</mat-error>
+                            </mat-form-field>
+                          </div>
+                          <!-- dateTo rendered alongside dateFrom above -->
+                          <ng-container *ngIf="field.fieldType === 'date' && field.id === 'dateTo'"></ng-container>
+
+                          <!-- Textarea Fields -->
+                          <div *ngIf="field.fieldType === 'textarea'" class="mb-3">
+                            <label class="form-label">{{ getFieldLabel(field) }}</label>
+                            <textarea class="form-control" [formControl]="education.get(field.id)" rows="4"></textarea>
+                            <div class="text-danger"
+                              *ngIf="education.get(field.id)?.invalid && education.get(field.id)?.touched">
+                              {{ getFieldLabel(field) }} is required
+                            </div>
+                          </div>
+
+                          <!-- Conditional "Other" Field for fieldMajor -->
+                          <app-text-input
+                            *ngIf="field.otherField && isOtherFieldSelected(education.get(field.id)?.value)"
+                            [type]="'text'" [fieldName]="field.otherField"
+                            [formControl]="education.get(field.otherField)"
+                            [placeholder]="'Please specify ' + getFieldLabel(field).toLowerCase()"></app-text-input>
+
+                        </ng-container>
+                      </ng-container>
+                      <!-- Achievements Section -->
+                      <div class="mb-3 mt-3">
+                        <label class="form-label">Achievements <span class="text-muted">(Optional)</span></label>
+                        <div *ngFor="let ach of getAchievements(i).controls; let j = index" class="input-group mb-2">
+                          <input type="text" class="form-control" [formControl]="$any(ach)"
+                            placeholder="e.g. Won gold medal, Top 5% of class" />
+                          <button type="button" class="btn btn-outline-danger" (click)="removeAchievement(i, j)">
+                            <mat-icon style="font-size:16px;vertical-align:-3px">remove_circle_outline</mat-icon>
+                          </button>
+                        </div>
+                        <div class="d-block">
+                          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="addAchievement(i)">
+                            <mat-icon class="me-1" style="font-size:16px;vertical-align:-3px">add</mat-icon>Add
+                            Achievement
+                          </button>
+                        </div>
                       </div>
-                      <div class="col-6">
-                        <mat-form-field class="w-100">
-                          <mat-label>To Date</mat-label>
-                          <input matInput [matDatepicker]="eduToPicker" [formControl]="education.get('dateTo')" readonly />
-                          <mat-datepicker-toggle matSuffix [for]="eduToPicker"></mat-datepicker-toggle>
-                          <mat-datepicker #eduToPicker="matDatepicker"></mat-datepicker>
-                          <mat-error *ngIf="education.get('dateTo')?.hasError('required')">To Date is required</mat-error>
-                        </mat-form-field>
-                      </div>
-                    </div>
-                    <!-- dateTo is rendered alongside dateFrom above -->
-                    <ng-container *ngIf="field.fieldType === 'date' && field.id === 'dateTo'"></ng-container>
-
-                    <!-- Textarea Fields -->
-                    <div *ngIf="field.fieldType === 'textarea'" class="mb-3">
-                      <label class="form-label">{{ getFieldLabel(field) }}</label>
-                      <textarea
-                        class="form-control"
-                        [formControl]="education.get(field.id)"
-                        rows="4"
-                      ></textarea>
-                      <div class="text-danger" *ngIf="education.get(field.id)?.invalid && education.get(field.id)?.touched">
-                        {{ getFieldLabel(field) }} is required
-                      </div>
-                    </div>
-
-                    <!-- Conditional "Other" Field for fieldMajor -->
-                    <app-text-input
-                      *ngIf="field.otherField && isOtherFieldSelected(education.get(field.id)?.value)"
-                      [type]="'text'"
-                      [fieldName]="field.otherField"
-                      [formControl]="education.get(field.otherField)"
-                      [placeholder]="'Please specify ' + getFieldLabel(field).toLowerCase()"
-                    ></app-text-input>
-
-                  </ng-container>
-                </ng-container>
-              </section>
+                    </section>
+                  </div>
+                  <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-primary" type="button"
+                      (click)="onEducationNext(stepper, stepper3, i, education)"><mat-icon class="me-1 align-middle"
+                        style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>Next</button>
+                    <button class="btn btn-danger" type="button" (click)="removeEducation(i)"
+                      [disabled]="(educationForm.get('educations')['controls'].length <= 1)"><mat-icon
+                        class="me-1 align-middle"
+                        style="font-size:18px;vertical-align:-4px">delete</mat-icon>Delete</button>
+                  </div>
+                </mat-step>
+              </form>
+            </mat-horizontal-stepper>
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <button class="btn btn-outline-primary" type="button" (click)="addEducation()"
+                [disabled]="(educationForm.get('educations')['controls'].length >= maxEducations)"><mat-icon
+                  class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">add_circle_outline</mat-icon>Add
+                Another Education</button>
             </div>
-            <button
-              class="btn btn-primary m-2 d-inline-block"
-              matStepperNext
-              (click)="markAllTouched(education)"
-            >
-              Next
-            </button>
-            <button
-              class="btn btn-danger m-2 d-inline-block"
-              type="button"
-              (click)="removeEducation(i)"
-              [disabled]="(educationForm.get('educations')['controls'].length <= 1)"
-            >
-              Delete Education
-            </button>
-          </mat-step>
-        </form>
+          </div><!-- /[hidden] education forms -->
+        </mat-step>
+        <!-- Personal Details Page -->
         <mat-step>
-          <ng-template matStepLabel>All Details</ng-template>
-          <p>All Education Details are filled!</p>
-          <button matStepperPrevious class="btn btn-secondary m-2">Back</button>
-          <button
-            type="submit"
-            class="btn btn-primary m-2 d-inline-block"
-            matStepperForward
-            [disabled]="educationForm.invalid"
-            (click)="onEducationSubmit(stepper)"
-          >
-            Add Details
-          </button>
+          <ng-template matStepLabel>
+            <h3>Personal Details</h3>
+          </ng-template>
+          <form [formGroup]="personalDetailsForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+            <section>
+              <app-text-select type="select" [fieldName]="'gender'" [values]="genderOptions"
+                [formControl]="personalDetailsForm.get('gender')"></app-text-select>
+
+              <app-text-input [type]="'date'" [fieldName]="'dateOfBirth'"
+                [formControl]="personalDetailsForm.get('dateOfBirth')"></app-text-input>
+
+              <app-text-input [type]="'text'" [fieldName]="'fathersName'"
+                [formControl]="personalDetailsForm.get('fathersName')"></app-text-input>
+
+              <!-- Address Fields -->
+              <div class="mb-1"><label class="form-label fw-bold">Address</label></div>
+              <app-text-input [type]="'text'" [fieldName]="'streetName'"
+                [formControl]="personalDetailsForm.get('streetName')"></app-text-input>
+              <div class="row g-2 mb-2">
+                <div class="col-md-6">
+                  <app-text-input [type]="'text'" [fieldName]="'city'"
+                    [formControl]="personalDetailsForm.get('city')"></app-text-input>
+                </div>
+                <div class="col-md-6">
+                  <app-text-input [type]="'text'" [fieldName]="'state'"
+                    [formControl]="personalDetailsForm.get('state')"></app-text-input>
+                </div>
+                <div class="col-md-6">
+                  <app-text-input [type]="'text'" [fieldName]="'country'"
+                    [formControl]="personalDetailsForm.get('country')"></app-text-input>
+                </div>
+                <div class="col-md-6">
+                  <app-text-input [type]="'text'" [fieldName]="'postalCode'"
+                    [formControl]="personalDetailsForm.get('postalCode')"></app-text-input>
+                </div>
+              </div>
+
+              <!-- Languages Known -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Languages Known <small class="text-muted fw-normal">(optional)</small></label>
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                  <span *ngFor="let lang of getLanguages().controls; let i = index"
+                    class="badge bg-secondary d-inline-flex align-items-center gap-1 p-2" style="font-size:13px">
+                    {{ lang.value }}
+                    <button type="button" class="btn-close btn-close-white" style="font-size:9px;opacity:0.8"
+                      (click)="removeLanguage(i)"></button>
+                  </span>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <select class="form-select form-select-sm" #langSelect style="max-width:240px">
+                    <option value="">— Select language —</option>
+                    <option *ngFor="let l of WORLD_LANGUAGES" [value]="l">{{ l }}</option>
+                  </select>
+                  <button type="button" class="btn btn-outline-secondary btn-sm"
+                    (click)="addLanguageFromSelect(langSelect)">
+                    <mat-icon style="font-size:16px;vertical-align:-3px">add</mat-icon> Add
+                  </button>
+                </div>
+              </div>
+
+              <!-- Declaration -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Declaration</label>
+                <div class="d-flex gap-2 mb-2">
+                  <button type="button" class="btn btn-sm"
+                    [class.btn-primary]="declarationMode === 'format'"
+                    [class.btn-outline-primary]="declarationMode !== 'format'"
+                    (click)="switchToFormatDeclaration()">Use Format</button>
+                  <button type="button" class="btn btn-sm"
+                    [class.btn-primary]="declarationMode === 'custom'"
+                    [class.btn-outline-primary]="declarationMode !== 'custom'"
+                    (click)="switchToCustomDeclaration()">Write My Own</button>
+                </div>
+                <ng-container *ngIf="declarationMode === 'format'">
+                  <select class="form-select mb-2" #declSelect (change)="selectedDeclaration = declSelect.value">
+                    <option *ngFor="let decl of declarationFormats; let fi = index" [value]="decl"
+                      [selected]="decl === selectedDeclaration">Format {{ fi + 1 }}</option>
+                  </select>
+                  <div class="p-3 bg-light border rounded text-muted small mb-2">{{ selectedDeclaration }}</div>
+                </ng-container>
+                <ng-container *ngIf="declarationMode === 'custom'">
+                  <textarea class="form-control mb-2" rows="4" placeholder="Write your own declaration here…"
+                    [value]="customDeclarationText"
+                    (input)="onCustomDeclarationInput($event)"></textarea>
+                </ng-container>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="declarationConfirm"
+                    formControlName="declaration" />
+                  <label class="form-check-label" for="declarationConfirm">
+                    I agree to the above declaration
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <div class="mt-3">
+              <button type="button" class="btn btn-secondary m-2" matStepperPrevious>
+                <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_back</mat-icon>Back
+              </button>
+              <button type="button" class="btn btn-primary m-2" matStepperNext [disabled]="personalDetailsForm.invalid">
+                Next <mat-icon class="ms-1 align-middle"
+                  style="font-size:18px;vertical-align:-4px">arrow_forward</mat-icon>
+              </button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Done</ng-template>
+          <div class="completion-container">
+            <div class="completion-message">
+              <h2><mat-icon class="me-2 align-middle"
+                  style="font-size:28px;vertical-align:-6px">check_circle</mat-icon>Your Resume is Complete!</h2>
+              <p>Congratulations! You have successfully created your resume. You can now view or download your
+                professional resume.</p>
+            </div>
+            <div class="button-group">
+              <button mat-raised-button color="primary" routerLink="/resume/view" class="view-resume-btn">
+                <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">visibility</mat-icon>View
+                My Resume
+              </button>
+              <button mat-raised-button (click)="stepper.reset()" class="create-new-btn">
+                <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">refresh</mat-icon>Create
+                New Resume
+              </button>
+              <button mat-button matStepperPrevious class="back-btn">
+                <mat-icon class="me-1 align-middle" style="font-size:18px;vertical-align:-4px">arrow_back</mat-icon>Back
+              </button>
+            </div>
+          </div>
         </mat-step>
       </mat-horizontal-stepper>
-    </mat-step>
-    <!-- Personal Details Page -->
-    <mat-step *ngIf="personalDetailsForm">
-      <ng-template matStepLabel>
-        <h3>Personal Details</h3>
-      </ng-template>
-      <form
-        [formGroup]="personalDetailsForm"
-        (ngSubmit)="onSubmit()"
-        class="needs-validation"
-        novalidate
-      >
-        <section>
-          <app-text-select
-            [type]="select"
-            [fieldName]="'gender'"
-            [values]="genderOptions"
-            [formControl]="personalDetailsForm.get('gender')"
-          ></app-text-select>
-
-          <app-text-input
-            [type]="'date'"
-            [fieldName]="'dateOfBirth'"
-            [formControl]="personalDetailsForm.get('dateOfBirth')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'text'"
-            [fieldName]="'fathersName'"
-            [formControl]="personalDetailsForm.get('fathersName')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'textarea'"
-            [fieldName]="'address'"
-            [formControl]="personalDetailsForm.get('address')"
-          ></app-text-input>
-
-          <app-text-input
-            [type]="'checkbox'"
-            [fieldName]="'declaration'"
-            [values]="declarationValues"
-            [formControl]="personalDetailsForm.get('declaration')"
-          ></app-text-input>
-        </section>
-
-        <div class="mt-3">
-          <button
-            type="button"
-            class="btn btn-secondary m-2"
-            matStepperPrevious
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary m-2"
-            matStepperNext
-            [disabled]="personalDetailsForm.invalid"
-          >
-            Next
-          </button>
-        </div>
-      </form>
-    </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Done</ng-template>
-      <div class="completion-container">
-        <div class="completion-message">
-          <h2>✓ Your Resume is Complete!</h2>
-          <p>Congratulations! You have successfully created your resume. You can now view or download your professional resume.</p>
-        </div>
-        <div class="button-group">
-          <button mat-raised-button color="primary" routerLink="/resume/view" class="view-resume-btn">
-            View My Resume
-          </button>
-          <button mat-raised-button (click)="stepper.reset()" class="create-new-btn">
-            Create New Resume
-          </button>
-          <button mat-button matStepperPrevious class="back-btn">
-            Back
-          </button>
-        </div>
-      </div>
-    </mat-step>
-  </mat-horizontal-stepper>
+    </div>
+  </div>
 </div>

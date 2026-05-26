@@ -12,6 +12,7 @@ import { UtilModule } from './util/util.module';
 import { ResumeModule } from './resume/resume.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 import { SectionModule } from './section/section.module';
 
 @NgModule({
@@ -31,6 +32,7 @@ import { SectionModule } from './section/section.module';
     ResumeModule,
     BrowserAnimationsModule,
     MatToolbarModule,
+    MatIconModule,
     SectionModule
   ],
   providers: [],

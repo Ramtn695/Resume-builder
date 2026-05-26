@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CAREER_OBJECTIVES, CAREER_OBJECTIVE_CATEGORIES } from 'src/constants/career-objectives';
 import { EducationService } from '../resume/services/education.service';
+import { LocationService } from '../resume/services/location.service';
+import { EMAIL_DOMAINS, AGREEMENT_TEXT } from '../resume/constants/app.constants';
 
 @Component({
   selector: 'app-landing',
@@ -17,6 +19,15 @@ export class LandingComponent implements OnInit {
   readonly TOTAL_STEPS = 5;
   readonly stepLabels = ['Your Details', 'Experience Type', 'Agreement', 'Summary / Objective', 'Additional Info'];
 
+  // ── Step 1: Location (optional) ──────────────────────────────────
+  landingCountry = '';
+  landingState = '';
+  landingCity = '';
+  landingPostalCode = '';
+  landingCountries: string[] = [];
+  landingStates: string[] = [];
+  landingCities: string[] = [];
+
   // ── Step 1: Your Details ──────────────────────────────────────────
   firstName = '';
   middleName = '';
@@ -24,7 +35,8 @@ export class LandingComponent implements OnInit {
   email = '';
   fieldTouched: { [key: string]: boolean } = {};
 
-  readonly emailDomains = ['gmail.com', 'outlook.com', 'yahoo.com', 'hotmail.com'];
+  readonly emailDomains = EMAIL_DOMAINS;
+  readonly agreementText = AGREEMENT_TEXT;
 
   get emailSuggestions(): string[] {
     const localPart = this.email.split('@')[0];
@@ -65,12 +77,28 @@ export class LandingComponent implements OnInit {
   educationPreviewLevels: string[] = [];
   educationCountriesList: { name: string; isoCode: string }[] = [];
 
-  constructor(private router: Router, private educationService: EducationService) {}
+  constructor(private router: Router, private educationService: EducationService, private locationService: LocationService) {}
 
   ngOnInit(): void {
     localStorage.clear();
     sessionStorage.clear();
     this.educationCountriesList = this.educationService.getEducationCountries();
+    this.landingCountries = this.locationService.getCountries().map((c: any) => c.name);
+  }
+
+  onLandingCountryChange(country: string): void {
+    const code = this.locationService.getCountryCode(country);
+    this.landingStates = this.locationService.getStates(code).map((s: any) => s.name);
+    this.landingState = '';
+    this.landingCity = '';
+    this.landingCities = [];
+  }
+
+  onLandingStateChange(state: string): void {
+    const code = this.locationService.getCountryCode(this.landingCountry);
+    const stateCode = this.locationService.getStateCode(code, state);
+    this.landingCities = this.locationService.getCities(code, stateCode);
+    this.landingCity = '';
   }
 
   // ── Step Navigation ───────────────────────────────────────────────
@@ -272,6 +300,12 @@ export class LandingComponent implements OnInit {
     sessionStorage.setItem('experienceType', this.experienceType);
     sessionStorage.setItem('educationPreferences', JSON.stringify({
       preferredCountry: this.educationCountryPreference || ''
+    }));
+    sessionStorage.setItem('landingLocation', JSON.stringify({
+      country: this.landingCountry,
+      state: this.landingState,
+      city: this.landingCity,
+      postalCode: this.landingPostalCode
     }));
     this.router.navigate(['/resume/form']);
   }

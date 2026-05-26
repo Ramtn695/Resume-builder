@@ -1,26 +1,46 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ResumeService } from '../services/resume.service';
 import {
   CATEGORY,
   PROGRAM_NAME,
-  SPECIALIZATION_MAP,
-  ALL_PROGRAMS,
-  PROGRAMS_BY_LEVEL
+  SPECIALIZATION_MAP
 } from 'src/constants/resume.constants';
+import { GENDER_OPTIONS, DECLARATION_FORMATS } from '../constants/app.constants';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatStepper } from '@angular/material/stepper';
 import { FormUtils } from './form.utils';
 import { EducationFormField, ExperienceFormField, ProjectFormField, PersonalDetailsFormField } from './form.fields';
 import { LocationService } from '../services/location.service';
 import { EducationService } from '../services/education.service';
 
+const MONTH_YEAR_FORMATS = {
+  parse: { dateInput: null },
+  display: {
+    dateInput: { month: 'short', year: 'numeric' },
+    monthYearLabel: { year: 'numeric', month: 'short' },
+    dateA11yLabel: { year: 'numeric', month: 'long', day: 'numeric' },
+    monthYearA11yLabel: { year: 'numeric', month: 'long' },
+  },
+};
+
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
-  styleUrls: ['./form.component.scss']
+  styleUrls: ['./form.component.scss'],
+  providers: [{ provide: MAT_DATE_FORMATS, useValue: MONTH_YEAR_FORMATS }]
 })
 export class FormComponent implements OnInit {
+  @ViewChild('stepper') stepper!: MatStepper;
+  @ViewChild('stepper2') innerExperienceStepper!: MatStepper;
+  @ViewChild('stepper3') innerEducationStepper!: MatStepper;
+  formStepIndex = 0;
+  maxReachedStep = 0;
+  isLoading = true;
+  showExperienceSummary = false;
+  showEducationSummary = false;
+
   professionalForm!: FormGroup;
   experienceForm!: FormGroup;
   educationForm!: FormGroup;
@@ -45,9 +65,28 @@ export class FormComponent implements OnInit {
   specializations: string[] = [];
   isExperienced = true;
   educationSpecializations: { [key: number]: string[] } = {};
-  genderOptions = ['Male', 'Female', 'Other', 'Prefer not to say'];
-  declarationValues = ['I hereby declare that the information provided in this resume is true and accurate to the best of my knowledge.'];
+  genderOptions = GENDER_OPTIONS;
+  declarationFormats = DECLARATION_FORMATS;
+  selectedDeclaration = DECLARATION_FORMATS[0];
+  declarationMode: 'format' | 'custom' = 'format';
+  customDeclarationText = '';
   specializationMap = SPECIALIZATION_MAP;
+
+  readonly WORLD_LANGUAGES: string[] = [
+    'Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Assamese', 'Azerbaijani', 'Basque',
+    'Belarusian', 'Bengali', 'Bhojpuri', 'Bosnian', 'Bulgarian', 'Catalan',
+    'Chinese (Cantonese)', 'Chinese (Mandarin)', 'Croatian', 'Czech', 'Danish', 'Dari',
+    'Dutch', 'English', 'Estonian', 'Finnish', 'French', 'Galician', 'Georgian',
+    'German', 'Greek', 'Gujarati', 'Hausa', 'Hebrew', 'Hindi', 'Hungarian', 'Icelandic',
+    'Igbo', 'Indonesian', 'Irish', 'Italian', 'Japanese', 'Javanese', 'Kannada',
+    'Kazakh', 'Khmer', 'Korean', 'Kurdish', 'Kyrgyz', 'Lao', 'Latvian', 'Lithuanian',
+    'Macedonian', 'Malagasy', 'Malay', 'Malayalam', 'Maltese', 'Marathi', 'Mongolian',
+    'Nepali', 'Norwegian', 'Odia', 'Pashto', 'Persian/Farsi', 'Polish', 'Portuguese',
+    'Punjabi', 'Romanian', 'Russian', 'Sanskrit', 'Serbian', 'Sinhalese', 'Slovak',
+    'Slovenian', 'Somali', 'Spanish', 'Swahili', 'Swedish', 'Tagalog/Filipino', 'Tajik',
+    'Tamil', 'Telugu', 'Thai', 'Turkish', 'Turkmen', 'Ukrainian', 'Urdu', 'Uzbek',
+    'Vietnamese', 'Welsh', 'Xhosa', 'Yoruba', 'Zulu'
+  ];
 
   // Configuration from config.js
   maxEducations: number = (window as any).appConfig?.maxEducations || 5;
@@ -92,24 +131,40 @@ export class FormComponent implements OnInit {
       } catch { }
     }
 
-    this.initializeLocations();
-    this.professionalForm = this.fb.group({
-      firstName: [firstName || '', [Validators.required, Validators.minLength(3)]],
-      middleName: [middleName || ''],
-      lastName: [lastName || '', Validators.required],
-      jobTitle: ['', Validators.required],
-      phoneNumber: [
-        '',
-        [Validators.required, Validators.pattern(`^[6-9][0-9]{9}$`)],
-      ],
-      email: [email || '', [Validators.required, Validators.email]],
-      summary: [summary, Validators.required],
-      expOrFresher: [experienceType, Validators.required],
-      skillsSummary: this.fb.array([]),
-      skillsKnown: this.fb.array([])
-    });
-    this.initializeForms();
-    this.initializePersonalDetailsForm();
+    // Defer form initialization so spinner renders on first change-detection cycle
+    setTimeout(() => {
+      this.initializeLocations();
+      this.professionalForm = this.fb.group({
+        firstName: [firstName || '', [Validators.required, Validators.minLength(3)]],
+        middleName: [middleName || ''],
+        lastName: [lastName || '', Validators.required],
+        jobTitle: ['', Validators.required],
+        phoneNumber: [
+          '',
+          [Validators.required, Validators.pattern(`^[6-9][0-9]{9}$`)],
+        ],
+        email: [email || '', [Validators.required, Validators.email]],
+        summary: [summary, Validators.required],
+        expOrFresher: [experienceType, Validators.required],
+        skillsSummary: this.fb.array([]),
+        skillsKnown: this.fb.array([])
+      });
+      this.initializeForms();
+      this.initializePersonalDetailsForm();
+
+      // Pre-populate address fields from landing location
+      const locationData = sessionStorage.getItem('landingLocation');
+      if (locationData) {
+        try {
+          const loc = JSON.parse(locationData);
+          if (loc.city) this.personalDetailsForm.get('city')?.setValue(loc.city);
+          if (loc.state) this.personalDetailsForm.get('state')?.setValue(loc.state);
+          if (loc.country) this.personalDetailsForm.get('country')?.setValue(loc.country);
+          if (loc.postalCode) this.personalDetailsForm.get('postalCode')?.setValue(loc.postalCode);
+        } catch { }
+      }
+      this.isLoading = false;
+    }, 0);
   }
 
 
@@ -133,14 +188,22 @@ export class FormComponent implements OnInit {
   initializeForms(): void {
     const experienceGroup = this.formUtilService.createFormGroups(ExperienceFormField, this.fb);
     const educationGroup = this.formUtilService.createFormGroups(EducationFormField, this.fb);
+    educationGroup.addControl('achievements', this.fb.array([]));
     const projectGroup = this.formUtilService.createFormGroups(ProjectFormField, this.fb);
+
+    // Pre-populate institutionCountry for the first education entry from landing preference
+    if (this.educationPreferredCountry) {
+      educationGroup.patchValue({ institutionCountry: this.educationPreferredCountry });
+      const countryCode = this.locationService.getCountryCode(this.educationPreferredCountry);
+      this.educationStates[0] = this.locationService.getStates(countryCode).map(s => s.name);
+    }
+
     this.experienceForm = this.fb.group({
       experiences: this.fb.array([experienceGroup])
     });
     this.projectForm = this.fb.group({
       projects: this.fb.array([projectGroup])
     });
-
     this.educationForm = this.fb.group({
       educations: this.fb.array([educationGroup])
     });
@@ -161,9 +224,9 @@ export class FormComponent implements OnInit {
     this.resumeDetails = {
       professionalDetails: this.professionalForm.value,
       educationDetails: this.educationForm.value,
-      experienceDetails: this.experienceForm.value,
+      experienceDetails: this.experienceForm.getRawValue(),
       projectDetails: this.projectForm.value,
-      personalDetails: this.professionalForm.value,
+      personalDetails: { ...this.personalDetailsForm.value, declarationText: this.selectedDeclaration },
       summaryData: JSON.parse(sessionStorage.getItem('resumeSummary') || 'null')
     }
     this.resumeService.createResume(this.resumeDetails);
@@ -173,7 +236,15 @@ export class FormComponent implements OnInit {
   addEducation(): void {
     const educationArray = this.educationForm.get('educations') as FormArray;
     if (educationArray.length < this.maxEducations) {
+      const newIndex = educationArray.length;
       const educationGroup = this.formUtilService.createFormGroups(EducationFormField, this.fb);
+      educationGroup.addControl('achievements', this.fb.array([]));
+      // Pre-populate institutionCountry from education preference for every new entry
+      if (this.educationPreferredCountry) {
+        educationGroup.patchValue({ institutionCountry: this.educationPreferredCountry });
+        const countryCode = this.locationService.getCountryCode(this.educationPreferredCountry);
+        this.educationStates[newIndex] = this.locationService.getStates(countryCode).map(s => s.name);
+      }
       educationArray.push(educationGroup);
       this.educationForm = this.fb.group({
         educations: educationArray
@@ -257,7 +328,8 @@ export class FormComponent implements OnInit {
   initializePersonalDetailsForm(): void {
     const personalDetailsGroup = this.formUtilService.createFormGroups(PersonalDetailsFormField, this.fb);
     this.personalDetailsForm = this.fb.group({
-      ...personalDetailsGroup.controls
+      ...personalDetailsGroup.controls,
+      languages: this.fb.array([this.fb.control('English')])
     });
   }
 
@@ -293,6 +365,41 @@ export class FormComponent implements OnInit {
   // Get Skills Known array
   getSkillsKnown(): FormArray {
     return this.professionalForm.get('skillsKnown') as FormArray;
+  }
+
+  // ============== LANGUAGES ==============
+
+  getLanguages(): FormArray {
+    return this.personalDetailsForm.get('languages') as FormArray;
+  }
+
+  addLanguageFromSelect(selectEl: HTMLSelectElement): void {
+    const lang = selectEl.value;
+    if (lang && !this.getLanguages().controls.some(c => c.value === lang)) {
+      this.getLanguages().push(this.fb.control(lang));
+    }
+    selectEl.value = '';
+  }
+
+  removeLanguage(index: number): void {
+    this.getLanguages().removeAt(index);
+  }
+
+  // ============== DECLARATION ==============
+
+  switchToFormatDeclaration(): void {
+    this.declarationMode = 'format';
+    this.selectedDeclaration = this.declarationFormats[0];
+  }
+
+  switchToCustomDeclaration(): void {
+    this.declarationMode = 'custom';
+    this.selectedDeclaration = this.customDeclarationText;
+  }
+
+  onCustomDeclarationInput(event: Event): void {
+    this.customDeclarationText = (event.target as HTMLTextAreaElement).value;
+    this.selectedDeclaration = this.customDeclarationText;
   }
 
   // ============== DYNAMIC FORM METHODS ==============
@@ -385,9 +492,10 @@ export class FormComponent implements OnInit {
     const strVal = Array.isArray(val) ? (val[0] || '') : String(val);
     if (!strVal.trim() || strVal === 'null') return false;
 
-    // For program field: only show when the selected course level has sub-programs
+    // For program field: only show when the selected course level has sub-programs via education service
     if (field.valuesSource === 'program') {
-      return strVal in (PROGRAMS_BY_LEVEL as Record<string, string[]>);
+      const country = formGroup.get('institutionCountry')?.value || '';
+      return this.educationService.getFieldMajorOptions(country, strVal).length > 0;
     }
 
     // For specialization field: only show when the selected program has known specializations
@@ -501,14 +609,126 @@ export class FormComponent implements OnInit {
   }
 
   getProgram(field: any, formGroup: FormGroup, index?: number): string[] {
+    const country = formGroup.get('institutionCountry')?.value || '';
     const courseVal = formGroup.get('courseName')?.value;
     if (!courseVal) return [];
-    const levelMap = PROGRAMS_BY_LEVEL[courseVal];
-    return levelMap ? levelMap : [];
+    return this.educationService.getFieldMajorOptions(country, courseVal);
+  }
+
+  getVisibleFormSteps(): string[] {
+    const steps = ['Professional Details'];
+    if (this.isExperienced) steps.push('Experience Details');
+    steps.push('Education Details', 'Personal Details', 'Done');
+    return steps;
+  }
+
+  goToStep(index: number): void {
+    if (this.stepper && index <= this.maxReachedStep) {
+      this.stepper.selectedIndex = index;
+    }
+  }
+
+  onStepChange(event: any): void {
+    this.formStepIndex = event.selectedIndex;
+    if (event.selectedIndex > this.maxReachedStep) {
+      this.maxReachedStep = event.selectedIndex;
+    }
+  }
+
+  selectMonthYear(normalizedDate: Date, datepicker: any, ctrl: AbstractControl | null): void {
+    if (!ctrl) return;
+    const d = new Date(normalizedDate);
+    d.setDate(1);
+    ctrl.setValue(d);
+    datepicker.close();
+  }
+
+  onCurrentlyWorkingChange(formGroup: FormGroup, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      formGroup.get('dateTo')?.disable();
+      formGroup.get('dateTo')?.setValue(null);
+    } else {
+      formGroup.get('dateTo')?.enable();
+    }
+  }
+
+  onExperienceNext(outerStepper: MatStepper, innerStepper: MatStepper, index: number, formGroup: FormGroup): void {
+    this.markAllTouched(formGroup);
+    if (!formGroup.valid) return;
+    const total = (this.experienceForm.get('experiences') as FormArray).length;
+    if (index === total - 1) {
+      this.showExperienceSummary = true;
+    } else {
+      innerStepper.next();
+    }
+  }
+
+  onEducationNext(outerStepper: MatStepper, innerStepper: MatStepper, index: number, formGroup: FormGroup): void {
+    this.markAllTouched(formGroup);
+    if (!formGroup.valid) return;
+    const total = (this.educationForm.get('educations') as FormArray).length;
+    if (index === total - 1) {
+      this.showEducationSummary = true;
+    } else {
+      innerStepper.next();
+    }
   }
 
   markAllTouched(formGroup: FormGroup): void {
     formGroup.markAllAsTouched();
+  }
+
+  acceptExperienceSummary(outerStepper: MatStepper): void {
+    this.showExperienceSummary = false;
+    this.onExperienceSubmit(outerStepper);
+  }
+
+  acceptEducationSummary(outerStepper: MatStepper): void {
+    this.showEducationSummary = false;
+    this.onEducationSubmit(outerStepper);
+  }
+
+  editExperience(index: number): void {
+    this.showExperienceSummary = false;
+    setTimeout(() => {
+      if (this.innerExperienceStepper) {
+        this.innerExperienceStepper.selectedIndex = index;
+      }
+    });
+  }
+
+  editEducation(index: number): void {
+    this.showEducationSummary = false;
+    setTimeout(() => {
+      if (this.innerEducationStepper) {
+        this.innerEducationStepper.selectedIndex = index;
+      }
+    });
+  }
+
+  getExperienceEntries(): AbstractControl[] {
+    return (this.experienceForm.get('experiences') as FormArray).controls;
+  }
+
+  getEducationEntries(): AbstractControl[] {
+    return (this.educationForm.get('educations') as FormArray).controls;
+  }
+
+  getEntryValue(entry: AbstractControl, key: string): any {
+    return entry.get(key)?.value;
+  }
+
+  getAchievements(educationIndex: number): FormArray {
+    return (this.educationForm.get('educations') as FormArray).at(educationIndex).get('achievements') as FormArray;
+  }
+
+  addAchievement(educationIndex: number): void {
+    this.getAchievements(educationIndex).push(this.fb.control(''));
+  }
+
+  removeAchievement(educationIndex: number, achIndex: number): void {
+    this.getAchievements(educationIndex).removeAt(achIndex);
   }
 
   onDestroy() {
