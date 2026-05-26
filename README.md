@@ -653,5 +653,3 @@ See `FORM_ARCHITECTURE.md` for comprehensive documentation including:
 ---
 
 **ResumeBuilder** © 2026 | Version 1.3.0
-#   R e s u m e - b u i l d e r  
- 
